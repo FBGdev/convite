@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Acesso ao painel · {{ event.name }}{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block content %}
+<main class="login-page"><div class="login-card"><a class="back-link" href="{{ url_for('invite') }}">← Voltar ao convite</a><div class="admin-monogram">{{ event.name[0] }}</div><span class="section-label">ÁREA PRIVADA</span><h1>Seu painel de convidados.</h1><p>Entre com a senha para acompanhar as respostas.</p><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% if error %}<div class="form-error" role="alert">{{ error }}</div>{% endif %}<label for="password">Senha</label><input id="password" name="password" type="password" autocomplete="current-password" required autofocus><button class="button button-dark" type="submit">Entrar no painel <span aria-hidden="true">↗</span></button></form></div></main>
+{% endblock %}

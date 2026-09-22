@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<main>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-line"></span>VOCÊ ESTÁ CONVIDADO(A)</div>
+        <h1 id="hero-title">Vamos celebrar <em>a vida?</em></h1>
+        <p class="hero-intro">O aniversário de <strong>{{ event.name }}</strong> está chegando e essa noite só fica completa com você por perto.</p>
+        <a class="button button-primary hero-button" href="#confirmar">Confirmar presença <span aria-hidden="true">↗</span></a>
+        <div class="hero-date"><span>{{ event_day }}</span><span class="date-rule"></span><span>{{ event_month | upper }}<br>{{ event.time }}</span></div>
+      </div>
+      <div class="hero-art-wrap">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <img class="hero-art" src="{{ url_for('static', filename='birthday-art.svg') }}" alt="Ilustração de um bolo de aniversário com velas e estrelas">
+        <span class="art-caption">A NOITE É NOSSA ✦</span>
+      </div>
+    </div>
+    <div class="hero-bottom"><span>UMA DATA ESPECIAL PARA GUARDAR</span><span class="scroll-cue">DESLIZE PARA VER MAIS ↓</span></div>
+  </section>
+
+  <section class="details" aria-labelledby="details-title">
+    <div class="section-label">OS DETALHES</div>
+    <div class="details-grid">
+      <div class="details-heading"><h2 id="details-title">Marque na<br><em>agenda.</em></h2><p>{{ event.message }}</p></div>
+      <div class="detail-list">
+        <div class="detail-item"><div class="detail-icon" aria-hidden="true">✳</div><div><span class="detail-kicker">QUANDO</span><strong>{{ event_weekday | title }}, {{ event_day }} de {{ event_month }}</strong><span>A partir das {{ event.time }}</span></div></div>
+        <div class="detail-item"><div class="detail-icon" aria-hidden="true">⌖</div><div><span class="detail-kicker">ONDE</span><strong>{{ event.venue }}</strong><span>{{ event.address }}</span><a href="{{ maps_url }}" target="_blank" rel="noopener noreferrer">Abrir no Google Maps ↗</a></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rsvp" id="confirmar" aria-labelledby="rsvp-title">
+    <div class="rsvp-inner">
+      <div class="rsvp-aside"><div class="section-label">SUA RESPOSTA</div><h2 id="rsvp-title">Conta pra gente:<br><em>você vem?</em></h2><p>Leva menos de um minuto. Sua resposta ajuda a preparar tudo com carinho.</p><div class="rsvp-spark" aria-hidden="true">✳</div></div>
+      <form class="rsvp-form" method="post" action="{{ url_for('confirm') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if error %}<div class="form-error" role="alert">{{ error }}</div>{% endif %}
+        <label for="full_name">Nome completo <span>*</span></label>
+        <input id="full_name" name="full_name" type="text" autocomplete="name" required minlength="3" maxlength="120" placeholder="Como podemos chamar você?" value="{{ form.full_name if form else '' }}">
+        <label for="phone">Telefone / WhatsApp <span>*</span></label>
+        <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="(11) 99999-9999" value="{{ form.phone if form else '' }}">
+        <fieldset class="choice-group"><legend>Você vai comparecer? <span>*</span></legend>
+          <label class="choice"><input type="radio" name="attending" value="yes" required {% if form and form.attending == 'yes' %}checked{% endif %}><span class="choice-mark"></span><span>Sim, vou! <span aria-hidden="true">🎉</span></span></label>
+          <label class="choice"><input type="radio" name="attending" value="no" {% if form and form.attending == 'no' %}checked{% endif %}><span class="choice-mark"></span><span>Infelizmente, não poderei ir</span></label>
+        </fieldset>
+        {% if event.allow_companions %}<div id="companions-field" class="companions-field"><label for="companions">Vai levar acompanhantes?</label><select id="companions" name="companions">{% for number in range(event.max_companions + 1) %}<option value="{{ number }}" {% if form and form.companions == number|string %}selected{% endif %}>{{ number }} {% if number == 1 %}acompanhante{% else %}acompanhantes{% endif %}</option>{% endfor %}</select></div>{% endif %}
+        <div id="edit-field" class="edit-field {% if not show_edit %}is-hidden{% endif %}"><label for="edit_code">Código de edição</label><input id="edit_code" name="edit_code" type="text" autocomplete="off" maxlength="12" placeholder="Código recebido antes"><small>Preencha somente se você já respondeu com este telefone.</small></div>
+        <button class="button button-dark" type="submit">Enviar resposta <span aria-hidden="true">↗</span></button>
+        <p class="form-footnote">Seus dados serão usados apenas para organizar esta festa.</p>
+      </form>
+    </div>
+  </section>
+</main>
+<footer class="public-footer"><span>FEITO COM CARINHO PARA CELEBRAR {{ event.name | upper }} ✳</span><a href="{{ url_for('admin_login') }}">Área da aniversariante</a></footer>
+<script src="{{ url_for('static', filename='invite.js') }}" defer></script>
+{% endblock %}
