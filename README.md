@@ -4,15 +4,15 @@ Site de convite com confirmação de presença, banco Supabase e painel privado.
 
 ## Personalizar a festa
 
-Edite `config.py`: nome, data (`AAAA-MM-DD`), horário, local, endereço, mensagem e regras de acompanhantes. A arte está em `static/birthday-art.svg`; as cores e fontes, em `static/style.css`.
+Edite `config.py`: nome, data (`AAAA-MM-DD`), horário, local, endereço, link do Google Maps, coordenadas do mapa, mensagem e chave Pix. A arte está em `static/birthday-art.svg`; as cores e fontes, em `static/style.css`. A variável de ambiente `PIX_KEY` pode substituir a chave definida em `config.py`. A seção de presentes fica oculta se ambas estiverem vazias.
 
-Os valores fornecidos são **exemplos**. Substitua tudo antes de compartilhar o link. Se mudar `max_companions` para mais de 4, ajuste também a restrição correspondente na migração SQL.
+Confira os dados da festa antes de compartilhar o link.
 
 ## Configurar o Supabase
 
 O projeto configurado é `qwrgrogsuxjxcuhmkxjj`.
 
-1. Execute `supabase/migrations/20260922_create_rsvps.sql` no SQL Editor desse projeto.
+1. As migrações `create_rsvps` e `add_children_to_rsvps` já foram aplicadas a esse projeto via MCP do Supabase. Para configurar outro projeto, execute os arquivos de `supabase/migrations/` em ordem no SQL Editor dele.
 2. Em **Settings → API Keys**, crie uma chave **secret** (`sb_secret_...`) exclusiva para este site. Guarde-a somente nas variáveis de ambiente do servidor.
 3. Defina `SUPABASE_URL=https://qwrgrogsuxjxcuhmkxjj.supabase.co` e `SUPABASE_SECRET_KEY` no servidor. Não use a chave `publishable` neste backend.
 
@@ -49,6 +49,10 @@ As respostas ficam no Supabase e continuam disponíveis depois que o contêiner 
 ## Como funciona
 
 - Cada telefone com DDD aceita uma resposta por evento. O formato com ou sem `+55` é normalizado.
+- Cada resposta registra apenas a pessoa que preenche o formulário; o convite não oferece opção de adicionar acompanhantes.
+- O formulário de confirmação abre em uma janela que ocupa a tela no celular; erros de validação reabrem a janela com os dados preenchidos.
+- O convite mostra um mapa do salão, um link para a página do local e um botão para traçar a rota pelo Google Maps.
+- A chave Pix é opcional e aparece na página pública quando estiver definida em `config.py` ou em `PIX_KEY`. Qualquer visitante poderá copiá-la.
 - Uma resposta repetida pede o código de edição exibido na primeira confirmação. O código é mostrado só uma vez e o banco armazena apenas seu hash. Se for perdido, a organizadora pode excluir o registro no painel para permitir uma nova resposta.
 - O painel mostra os totais, busca por nome, exclui respostas e exporta CSV. A lista nunca é exposta na página pública.
 - Defina uma senha forte no servidor. Sem `ADMIN_PASSWORD`, o painel não aceita login. `SECRET_KEY` deve permanecer estável entre reinícios para manter as sessões válidas.

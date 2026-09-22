@@ -13,16 +13,16 @@ class FakeStore:
     def by_phone(self, phone):
         return next((row for row in self.records if row["phone"] == phone), None)
 
-    def create(self, full_name, phone, attending, companions, code_hash, now):
+    def create(self, full_name, phone, attending, code_hash, now):
         if self.by_phone(phone):
             raise self.duplicate_error()
         self.records.append({"id": len(self.records) + 1, "full_name": full_name, "phone": phone,
-                             "attending": attending, "companions": companions,
+                             "attending": attending,
                              "edit_code_hash": code_hash, "updated_at": now})
 
-    def update(self, record_id, full_name, attending, companions, now):
+    def update(self, record_id, full_name, attending, now):
         row = next(row for row in self.records if row["id"] == record_id)
-        row.update(full_name=full_name, attending=attending, companions=companions, updated_at=now)
+        row.update(full_name=full_name, attending=attending, updated_at=now)
 
     def all(self):
         return list(self.records)
@@ -52,7 +52,7 @@ class InviteFlowTest(unittest.TestCase):
     def submit(self, **changes):
         self.client.get("/")
         data = {"csrf_token": self.csrf(), "full_name": "Ana Maria", "phone": "(11) 99999-1234",
-                "attending": "yes", "companions": "2"}
+                "attending": "yes"}
         data.update(changes)
         return self.client.post("/confirmar", data=data)
 
@@ -67,11 +67,10 @@ class InviteFlowTest(unittest.TestCase):
         code = re.search(rb'<strong>([A-F0-9]{12})</strong>', first.data).group(1).decode()
         self.assertEqual(self.submit(phone="+55 11 99999-1234").status_code, 409)
         self.assertEqual(self.submit(edit_code="WRONGCODE").status_code, 403)
-        updated = self.submit(attending="no", companions="4", edit_code=code)
+        updated = self.submit(attending="no", edit_code=code)
         self.assertEqual(updated.status_code, 200)
         self.assertEqual(len(self.module.store.records), 1)
         self.assertFalse(self.module.store.records[0]["attending"])
-        self.assertEqual(self.module.store.records[0]["companions"], 0)
 
     def test_private_dashboard_csv_and_delete(self):
         self.submit()
@@ -84,15 +83,51 @@ class InviteFlowTest(unittest.TestCase):
         csv_response = self.client.get("/admin/exportar.csv")
         self.assertEqual(csv_response.status_code, 200)
         self.assertIn("Ana Maria", csv_response.get_data(as_text=True))
+        self.assertNotIn("Acompanhantes", csv_response.get_data(as_text=True))
         record_id = self.module.store.records[0]["id"]
         self.assertEqual(self.client.post(f"/admin/excluir/{record_id}", data={"csrf_token": self.csrf()}).status_code, 302)
         self.assertEqual(self.module.store.records, [])
 
+    def test_dashboard_search_by_phone_and_status(self):
+        self.submit(full_name="Ana Maria", phone="(11) 99999-1234")
+        self.submit(full_name="Bruno Lima", phone="(21) 3333-2222", attending="no")
+        self.login()
+        page = self.client.get("/admin?q=21&status=no").get_data(as_text=True)
+        self.assertIn("Bruno Lima", page)
+        self.assertNotIn("Ana Maria", page)
+        self.assertIn("(21) 3333-2222", page)
+        self.assertIn("tel:+552133332222", page)
+        confirmed = self.client.get("/admin?status=yes").get_data(as_text=True)
+        self.assertIn("Ana Maria", confirmed)
+        self.assertNotIn("Bruno Lima", confirmed)
+
+    def test_brazilian_phone_validation_and_format(self):
+        self.assertEqual(self.module.normalize_phone("(11) 99999-1234"), "11999991234")
+        self.assertEqual(self.module.normalize_phone("(21) 3333-2222"), "2133332222")
+        self.assertEqual(self.module.format_phone("11999991234"), "(11) 99999-1234")
+        self.assertIsNone(self.module.normalize_phone("(00) 99999-1234"))
+        self.assertEqual(self.submit(phone="(00) 99999-1234").status_code, 400)
+
     def test_csrf_and_validation(self):
         self.assertEqual(self.client.post("/confirmar", data={"full_name": "Ana"}).status_code, 400)
-        self.assertEqual(self.submit(phone="123").status_code, 400)
+        invalid = self.submit(phone="123")
+        self.assertEqual(invalid.status_code, 400)
+        self.assertIn(b'data-open-on-load="true"', invalid.data)
+        self.assertIn(b'value="123"', invalid.data)
         self.assertEqual(self.submit(attending="maybe").status_code, 400)
-        self.assertEqual(self.submit(companions="99").status_code, 400)
+        self.assertEqual(self.submit(companions="99", children="99").status_code, 200)
+        self.assertNotIn("companions", self.module.store.records[0])
+
+    def test_invite_has_no_companion_fields(self):
+        page = self.client.get("/").get_data(as_text=True)
+        self.assertIn('<dialog id="rsvp-dialog"', page)
+        self.assertEqual(page.count('data-open-rsvp'), 2)
+        self.assertNotIn('name="companions"', page)
+        self.assertNotIn('name="children"', page)
+        self.assertNotIn('name="adult_names"', page)
+        self.assertIn(self.module.EVENT["maps_url"], page)
+        self.assertIn('title="Mapa do local da festa:', page)
+        self.assertIn('Traçar rota', page)
 
 
 class SupabaseRequestTest(unittest.TestCase):

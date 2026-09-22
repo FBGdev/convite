@@ -7,7 +7,7 @@
         <div class="eyebrow"><span class="eyebrow-line"></span>VOCÊ ESTÁ CONVIDADO(A)</div>
         <h1 id="hero-title">Vamos celebrar <em>a vida?</em></h1>
         <p class="hero-intro">O aniversário de <strong>{{ event.name }}</strong> está chegando e essa noite só fica completa com você por perto.</p>
-        <a class="button button-primary hero-button" href="#confirmar">Confirmar presença <span aria-hidden="true">↗</span></a>
+        <a class="button button-primary hero-button" href="#confirmar" data-open-rsvp>Confirmar presença <span aria-hidden="true">↗</span></a>
         <div class="hero-date"><span>{{ event_day }}</span><span class="date-rule"></span><span>{{ event_month | upper }}<br>{{ event.time }}</span></div>
       </div>
       <div class="hero-art-wrap">
@@ -28,28 +28,53 @@
         <div class="detail-item"><div class="detail-icon" aria-hidden="true">⌖</div><div><span class="detail-kicker">ONDE</span><strong>{{ event.venue }}</strong><span>{{ event.address }}</span><a href="{{ maps_url }}" target="_blank" rel="noopener noreferrer">Abrir no Google Maps ↗</a></div></div>
       </div>
     </div>
+    <div class="location-map" aria-labelledby="location-map-title">
+      <div class="location-map-copy">
+        <span class="section-label">COMO CHEGAR</span>
+        <h3 id="location-map-title">Seu caminho até <em>a festa.</em></h3>
+        <p><strong>{{ event.venue }}</strong><br>{{ event.address }}</p>
+        <a class="button button-dark" href="{{ directions_url }}" target="_blank" rel="noopener noreferrer">Traçar rota <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="location-map-frame">
+        <iframe title="Mapa do local da festa: {{ event.venue }}" src="{{ map_embed_url }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>
+    </div>
   </section>
+
+  {% if event.pix_key %}
+  <section class="gifts" aria-labelledby="gifts-title">
+    <div class="gifts-inner">
+      <div><span class="section-label">PRESENTES</span><h2 id="gifts-title">Sua presença já é <em>um presente.</em></h2><p>Se quiser presentear a {{ event.name }}, você também pode usar a chave Pix abaixo. Fique à vontade.</p></div>
+      <div class="pix-card"><span>CHAVE PIX</span><strong id="pix-key">{{ event.pix_key }}</strong><button id="copy-pix" type="button" aria-label="Copiar chave Pix">Copiar chave Pix</button><small id="copy-pix-status" role="status" aria-live="polite"></small></div>
+    </div>
+  </section>
+  {% endif %}
 
   <section class="rsvp" id="confirmar" aria-labelledby="rsvp-title">
     <div class="rsvp-inner">
       <div class="rsvp-aside"><div class="section-label">SUA RESPOSTA</div><h2 id="rsvp-title">Conta pra gente:<br><em>você vem?</em></h2><p>Leva menos de um minuto. Sua resposta ajuda a preparar tudo com carinho.</p><div class="rsvp-spark" aria-hidden="true">✳</div></div>
+      <div class="rsvp-prompt"><span class="section-label">CONFIRMAÇÃO</span><p>Já sabe se vai? Responda pelo formulário para ajudar a organizar a festa.</p><a class="button button-dark" href="#confirmar" data-open-rsvp>Abrir formulário <span aria-hidden="true">↗</span></a></div>
+    </div>
+    <dialog id="rsvp-dialog" class="rsvp-dialog" aria-labelledby="rsvp-dialog-title" data-open-on-load="{{ 'true' if error else 'false' }}">
+      <div class="rsvp-dialog-header"><div><span class="section-label">SUA RESPOSTA</span><h2 id="rsvp-dialog-title">Confirme sua <em>presença.</em></h2></div><button class="rsvp-close" type="button" aria-label="Fechar formulário" data-close-rsvp>×</button></div>
       <form class="rsvp-form" method="post" action="{{ url_for('confirm') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        {% if error %}<div class="form-error" role="alert">{{ error }}</div>{% endif %}
+        {% if error %}<div class="form-error" role="alert" tabindex="-1">{{ error }}</div>{% endif %}
         <label for="full_name">Nome completo <span>*</span></label>
         <input id="full_name" name="full_name" type="text" autocomplete="name" required minlength="3" maxlength="120" placeholder="Como podemos chamar você?" value="{{ form.full_name if form else '' }}">
         <label for="phone">Telefone / WhatsApp <span>*</span></label>
-        <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="(11) 99999-9999" value="{{ form.phone if form else '' }}">
+        <input id="phone" name="phone" type="tel" autocomplete="tel-national" inputmode="numeric" maxlength="15" required placeholder="(11) 99999-9999" aria-describedby="phone-hint" value="{{ form.phone if form else '' }}">
+        <small id="phone-hint" class="input-hint">Apenas DDD e número, sem +55.</small>
         <fieldset class="choice-group"><legend>Você vai comparecer? <span>*</span></legend>
           <label class="choice"><input type="radio" name="attending" value="yes" required {% if form and form.attending == 'yes' %}checked{% endif %}><span class="choice-mark"></span><span>Sim, vou! <span aria-hidden="true">🎉</span></span></label>
           <label class="choice"><input type="radio" name="attending" value="no" {% if form and form.attending == 'no' %}checked{% endif %}><span class="choice-mark"></span><span>Infelizmente, não poderei ir</span></label>
         </fieldset>
-        {% if event.allow_companions %}<div id="companions-field" class="companions-field"><label for="companions">Vai levar acompanhantes?</label><select id="companions" name="companions">{% for number in range(event.max_companions + 1) %}<option value="{{ number }}" {% if form and form.companions == number|string %}selected{% endif %}>{{ number }} {% if number == 1 %}acompanhante{% else %}acompanhantes{% endif %}</option>{% endfor %}</select></div>{% endif %}
         <div id="edit-field" class="edit-field {% if not show_edit %}is-hidden{% endif %}"><label for="edit_code">Código de edição</label><input id="edit_code" name="edit_code" type="text" autocomplete="off" maxlength="12" placeholder="Código recebido antes"><small>Preencha somente se você já respondeu com este telefone.</small></div>
         <button class="button button-dark" type="submit">Enviar resposta <span aria-hidden="true">↗</span></button>
         <p class="form-footnote">Seus dados serão usados apenas para organizar esta festa.</p>
       </form>
-    </div>
+    </dialog>
+    <noscript><style>#rsvp-dialog:not([open]){display:block;position:static;width:min(100%,580px);height:auto;max-width:none;max-height:none;margin:30px auto 0;overflow:visible}.rsvp-close{display:none}</style></noscript>
   </section>
 </main>
 <footer class="public-footer"><span>FEITO COM CARINHO PARA CELEBRAR {{ event.name | upper }} ✳</span><a href="{{ url_for('admin_login') }}">Área da aniversariante</a></footer>

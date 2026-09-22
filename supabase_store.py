@@ -54,22 +54,24 @@ class SupabaseStore:
         rows = self._request(params={"select": "id,edit_code_hash", "phone": f"eq.{phone}", "limit": "1"})
         return rows[0] if rows else None
 
-    def create(self, full_name, phone, attending, companions, code_hash, now):
+    def create(self, full_name, phone, attending, code_hash, now):
         self._request("POST", payload={
             "full_name": full_name,
             "phone": phone,
             "attending": attending,
-            "companions": companions,
+            "companions": 0,
+            "children": 0,
             "edit_code_hash": code_hash,
             "created_at": now,
             "updated_at": now,
         })
 
-    def update(self, record_id, full_name, attending, companions, now):
+    def update(self, record_id, full_name, attending, now):
         self._request("PATCH", params={"id": f"eq.{record_id}"}, payload={
             "full_name": full_name,
             "attending": attending,
-            "companions": companions,
+            "companions": 0,
+            "children": 0,
             "updated_at": now,
         })
 
@@ -78,7 +80,7 @@ class SupabaseStore:
         offset = 0
         while True:
             batch = self._request(params={
-                "select": "id,full_name,phone,attending,companions,updated_at",
+                "select": "id,full_name,phone,attending,updated_at",
                 "order": "updated_at.desc,id.desc",
                 "limit": "500",
                 "offset": str(offset),

@@ -2,13 +2,72 @@
 {% block title %}Painel de convidados · {{ event.name }}{% endblock %}
 {% block body_class %}admin-body{% endblock %}
 {% block content %}
-<main class="dashboard"><header class="dashboard-header"><div class="dashboard-brand"><div class="admin-monogram">{{ event.name[0] }}</div><div><span>ANIVERSÁRIO DE {{ event.name | upper }}</span><strong>Painel de convidados</strong></div></div><form method="post" action="{{ url_for('admin_logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="text-button" type="submit">Sair ↗</button></form></header>
-  <div class="dashboard-main"><div class="dashboard-intro"><div><span class="section-label">VISÃO GERAL</span><h1>Quem vem <em>celebrar?</em></h1><p>As confirmações aparecem aqui em tempo real.</p></div><a class="button button-outline" href="{{ url_for('admin_export') }}">Exportar CSV <span aria-hidden="true">↓</span></a></div>
-    <div class="stats"><div class="stat"><span>RESPOSTAS RECEBIDAS</span><strong>{{ totals.responses }}</strong><small>Total de convidados que responderam</small></div><div class="stat"><span>CONFIRMADOS</span><strong>{{ totals.attending }}</strong><small>Convidados que disseram sim</small></div><div class="stat"><span>NÃO PODERÃO IR</span><strong>{{ totals.declining }}</strong><small>Respostas negativas</small></div><div class="stat stat-highlight"><span>PESSOAS NA FESTA</span><strong>{{ totals.people }}</strong><small>Inclui acompanhantes</small></div></div>
-    <section class="guest-panel" aria-labelledby="guests-title"><div class="guest-toolbar"><div><span class="section-label">LISTA DE RESPOSTAS</span><h2 id="guests-title">Convidados</h2></div><form method="get" role="search"><label class="sr-only" for="search">Pesquisar por nome</label><input id="search" name="q" type="search" placeholder="Buscar por nome..." value="{{ query }}"><button type="submit" aria-label="Pesquisar">⌕</button></form></div>
+<main class="dashboard">
+  <header class="dashboard-header">
+    <div class="dashboard-brand">
+      <div class="admin-monogram" aria-hidden="true">{{ event.name[0] }}</div>
+      <div><span>ANIVERSÁRIO DE {{ event.name | upper }}</span><strong>Painel de convidados</strong></div>
+    </div>
+    <form method="post" action="{{ url_for('admin_logout') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="text-button" type="submit">Sair</button>
+    </form>
+  </header>
+
+  <div class="dashboard-main">
+    <div class="dashboard-intro">
+      <div><span class="section-label">VISÃO GERAL</span><h1>Quem vem <em>celebrar?</em></h1><p>Veja as respostas recebidas e encontre cada convidado.</p></div>
+      <a class="button button-outline" href="{{ url_for('admin_export') }}">Baixar lista CSV <span aria-hidden="true">↓</span></a>
+    </div>
+
+    <div class="stats" aria-label="Resumo das respostas">
+      <div class="stat"><span>RESPOSTAS</span><strong>{{ totals.responses }}</strong><small>Pessoas que responderam</small></div>
+      <div class="stat stat-highlight"><span>VÃO À FESTA</span><strong>{{ totals.attending }}</strong><small>Presenças confirmadas</small></div>
+      <div class="stat"><span>NÃO VÃO</span><strong>{{ totals.declining }}</strong><small>Respostas negativas</small></div>
+    </div>
+
+    <section class="guest-panel" aria-labelledby="guests-title">
+      <div class="guest-toolbar">
+        <div><span class="section-label">LISTA DE RESPOSTAS</span><h2 id="guests-title">Convidados</h2><p class="guest-count">{{ rows | length }} {{ 'resultado' if rows | length == 1 else 'resultados' }}{% if query or status != 'all' %} encontrados{% endif %}</p></div>
+        <form method="get" role="search" class="guest-search">
+          <label for="search">Nome ou telefone</label>
+          <div class="guest-search-fields">
+            <input id="search" name="q" type="search" placeholder="Buscar convidado" value="{{ query }}">
+            <label class="sr-only" for="status-filter">Filtrar por resposta</label>
+            <select id="status-filter" name="status">
+              <option value="all" {% if status == 'all' %}selected{% endif %}>Todas as respostas</option>
+              <option value="yes" {% if status == 'yes' %}selected{% endif %}>Confirmados</option>
+              <option value="no" {% if status == 'no' %}selected{% endif %}>Não vão</option>
+            </select>
+            <button class="button button-dark" type="submit">Buscar</button>
+          </div>
+          {% if query or status != 'all' %}<a class="clear-search" href="{{ url_for('admin_dashboard') }}">Limpar filtros</a>{% endif %}
+        </form>
+      </div>
+
       {% with messages = get_flashed_messages() %}{% for message in messages %}<div class="notice" role="status">{{ message }}</div>{% endfor %}{% endwith %}
-      {% if rows %}<div class="table-scroll"><table><thead><tr><th>CONVIDADO</th><th>TELEFONE</th><th>RESPOSTA</th><th>ACOMP.</th><th>CONFIRMADO EM</th><th><span class="sr-only">Ações</span></th></tr></thead><tbody>{% for row in rows %}<tr><td data-label="Convidado"><strong>{{ row.full_name }}</strong></td><td data-label="Telefone">{{ row.phone }}</td><td data-label="Resposta"><span class="status {% if row.attending %}status-yes{% else %}status-no{% endif %}"><span aria-hidden="true">●</span> {{ 'Confirmado' if row.attending else 'Não irá' }}</span></td><td data-label="Acompanhantes">{{ row.companions }}</td><td data-label="Confirmado em">{{ row.updated_at | br_date }}</td><td class="action-cell"><form method="post" action="{{ url_for('admin_delete', rsvp_id=row.id) }}" onsubmit="return confirm('Excluir esta resposta?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="delete-button" aria-label="Excluir {{ row.full_name }}">Excluir</button></form></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><span aria-hidden="true">✳</span><strong>{% if query %}Nenhum nome encontrado{% else %}As respostas vão aparecer aqui{% endif %}</strong><p>{% if query %}Tente outro termo para encontrar o convidado.{% else %}Compartilhe o link do convite para começar a receber confirmações.{% endif %}</p>{% if query %}<a href="{{ url_for('admin_dashboard') }}">Limpar busca</a>{% endif %}</div>{% endif %}
-    </section><div class="dashboard-footer">Convite de {{ event.name }} <span>·</span> Lista privada</div>
+      {% if rows %}
+      <div class="table-scroll">
+        <table class="guest-table">
+          <thead><tr><th>CONVIDADO</th><th>TELEFONE</th><th>RESPOSTA</th><th>ATUALIZADO EM</th><th><span class="sr-only">Ações</span></th></tr></thead>
+          <tbody>
+          {% for row in rows %}
+          <tr>
+            <td data-label="Convidado"><strong>{{ row.full_name }}</strong></td>
+            <td data-label="Telefone"><a class="guest-phone" href="tel:+55{{ row.phone }}">{{ row.phone | br_phone }}</a></td>
+            <td data-label="Resposta"><span class="status {% if row.attending %}status-yes{% else %}status-no{% endif %}"><span aria-hidden="true">●</span> {{ 'Confirmado' if row.attending else 'Não vai' }}</span></td>
+            <td data-label="Atualizado em">{{ row.updated_at | br_date }}</td>
+            <td class="action-cell"><form method="post" action="{{ url_for('admin_delete', rsvp_id=row.id) }}" onsubmit="return confirm('Excluir esta resposta? Esta ação não pode ser desfeita.')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="delete-button" aria-label="Excluir resposta de {{ row.full_name }}">Excluir resposta</button></form></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state"><span aria-hidden="true">✳</span><strong>{% if query or status != 'all' %}Nenhum convidado encontrado{% else %}As respostas vão aparecer aqui{% endif %}</strong><p>{% if query or status != 'all' %}Tente outro nome, telefone ou filtro.{% else %}Compartilhe o link do convite para receber as confirmações.{% endif %}</p>{% if query or status != 'all' %}<a href="{{ url_for('admin_dashboard') }}">Mostrar todos</a>{% endif %}</div>
+      {% endif %}
+    </section>
+    <div class="dashboard-footer">Convite de {{ event.name }} <span>·</span> Lista privada</div>
   </div>
 </main>
 {% endblock %}

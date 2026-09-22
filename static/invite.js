@@ -1,13 +1,74 @@
-const attendingInputs = document.querySelectorAll('input[name="attending"]');
-const companionsField = document.getElementById('companions-field');
-const companionsSelect = document.getElementById('companions');
+const rsvpDialog = document.getElementById('rsvp-dialog');
+let rsvpTrigger = null;
 
-function updateCompanions() {
-  if (!companionsField) return;
-  const yes = document.querySelector('input[name="attending"][value="yes"]')?.checked;
-  companionsField.hidden = !yes;
-  if (!yes && companionsSelect) companionsSelect.value = '0';
+function openRsvp(trigger = null) {
+  if (!rsvpDialog || rsvpDialog.open) return;
+  rsvpTrigger = trigger;
+  rsvpDialog.showModal();
+  document.body.classList.add('rsvp-modal-open');
+  const focusTarget = rsvpDialog.querySelector('.form-error') || document.getElementById('full_name');
+  focusTarget?.focus();
 }
 
-attendingInputs.forEach(input => input.addEventListener('change', updateCompanions));
-updateCompanions();
+document.querySelectorAll('[data-open-rsvp]').forEach(trigger => {
+  trigger.addEventListener('click', event => {
+    event.preventDefault();
+    openRsvp(trigger);
+  });
+});
+
+document.querySelector('[data-close-rsvp]')?.addEventListener('click', () => rsvpDialog?.close());
+rsvpDialog?.addEventListener('close', () => {
+  document.body.classList.remove('rsvp-modal-open');
+  rsvpTrigger?.focus();
+  rsvpTrigger = null;
+});
+
+if (rsvpDialog?.dataset.openOnLoad === 'true') openRsvp();
+
+const phoneInput = document.getElementById('phone');
+
+function maskBrazilianPhone(value) {
+  let digits = value.replace(/\D/g, '');
+  if (digits.startsWith('55') && digits.length > 11) digits = digits.slice(2);
+  digits = digits.slice(0, 11);
+  if (digits.length <= 2) return digits ? `(${digits}` : '';
+  const areaCode = digits.slice(0, 2);
+  const number = digits.slice(2);
+  if (number.length <= 4) return `(${areaCode}) ${number}`;
+  return `(${areaCode}) ${number.slice(0, -4)}-${number.slice(-4)}`;
+}
+
+phoneInput?.addEventListener('input', () => {
+  const before = phoneInput.value.slice(0, phoneInput.selectionStart ?? phoneInput.value.length);
+  const digitsBefore = before.replace(/\D/g, '').length;
+  const formatted = maskBrazilianPhone(phoneInput.value);
+  phoneInput.value = formatted;
+  let cursor = 0;
+  let seen = 0;
+  while (cursor < formatted.length && seen < digitsBefore) {
+    if (/\d/.test(formatted[cursor])) seen += 1;
+    cursor += 1;
+  }
+  phoneInput.setSelectionRange(cursor, cursor);
+});
+
+if (phoneInput?.value) phoneInput.value = maskBrazilianPhone(phoneInput.value);
+
+const copyPixButton = document.getElementById('copy-pix');
+
+copyPixButton?.addEventListener('click', async () => {
+  const pixKey = document.getElementById('pix-key');
+  const status = document.getElementById('copy-pix-status');
+  try {
+    await navigator.clipboard.writeText(pixKey.textContent.trim());
+    status.textContent = 'Chave Pix copiada!';
+  } catch {
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(pixKey);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    status.textContent = 'Chave selecionada. Copie com Ctrl+C.';
+  }
+});

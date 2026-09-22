@@ -1,25 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 660" role="img" aria-labelledby="title">
  <title id="title">Bolo de aniversário</title>
  <defs>
-  <linearGradient id="plate" x1="0" x2="1" y2="1"><stop stop-color="#ffb49e"/><stop offset="1" stop-color="#f07883"/></linearGradient>
-  <linearGradient id="cake" x1="0" x2="1" y2="1"><stop stop-color="#f9b2a2"/><stop offset="1" stop-color="#e9828c"/></linearGradient>
-  <linearGradient id="icing" x1="0" x2="1" y2="1"><stop stop-color="#fff1d9"/><stop offset="1" stop-color="#ffdbbf"/></linearGradient>
-  <filter id="shadow"><feDropShadow dx="0" dy="22" stdDeviation="22" flood-color="#100b18" flood-opacity=".3"/></filter>
+  <linearGradient id="plate" x1="0" x2="1" y2="1"><stop stop-color="#f0d999"/><stop offset="1" stop-color="#ad7643"/></linearGradient>
+  <linearGradient id="cake" x1="0" x2="1" y2="1"><stop stop-color="#bb8c57"/><stop offset="1" stop-color="#6b4227"/></linearGradient>
+  <linearGradient id="icing" x1="0" x2="1" y2="1"><stop stop-color="#fff9e9"/><stop offset="1" stop-color="#e9d6af"/></linearGradient>
+  <filter id="shadow"><feDropShadow dx="0" dy="22" stdDeviation="22" flood-color="#140b06" flood-opacity=".35"/></filter>
  </defs>
- <g fill="none" stroke="#e9a6a5" opacity=".7"><path d="M84 165l-7-10m7 10 11-6m-11 6-1 13" stroke-width="4" stroke-linecap="round"/><path d="M512 125l-5-16m5 16 16-4m-16 4-5 15" stroke-width="4" stroke-linecap="round"/><path d="M525 440l-5-16m5 16 15-4m-15 4-5 15" stroke-width="4" stroke-linecap="round"/><circle cx="117" cy="374" r="3" fill="#e9a6a5"/><circle cx="484" cy="259" r="4" fill="#e9a6a5"/><circle cx="135" cy="236" r="2" fill="#e9a6a5"/></g>
+ <g fill="none" stroke="#dfbb75" opacity=".8"><path d="M84 165l-7-10m7 10 11-6m-11 6-1 13" stroke-width="4" stroke-linecap="round"/><path d="M512 125l-5-16m5 16 16-4m-16 4-5 15" stroke-width="4" stroke-linecap="round"/><path d="M525 440l-5-16m5 16 15-4m-15 4-5 15" stroke-width="4" stroke-linecap="round"/><circle cx="117" cy="374" r="3" fill="#dfbb75"/><circle cx="484" cy="259" r="4" fill="#dfbb75"/><circle cx="135" cy="236" r="2" fill="#dfbb75"/></g>
  <g filter="url(#shadow)">
-  <ellipse cx="310" cy="565" rx="225" ry="38" fill="#cb657e"/>
+  <ellipse cx="310" cy="565" rx="225" ry="38" fill="#4c2e1d"/>
   <path d="M117 542c0 21 86 38 193 38s193-17 193-38v-13H117z" fill="url(#plate)"/>
-  <ellipse cx="310" cy="530" rx="193" ry="32" fill="#ffd7bd"/>
+  <ellipse cx="310" cy="530" rx="193" ry="32" fill="#e8c887"/>
   <path d="M169 339h282v173c0 34-63 52-141 52s-141-18-141-52z" fill="url(#cake)"/>
-  <ellipse cx="310" cy="337" rx="141" ry="33" fill="#f8c0ab"/>
+  <ellipse cx="310" cy="337" rx="141" ry="33" fill="#c89d68"/>
   <path d="M169 340c0-23 63-43 141-43s141 20 141 43v53c-9 0-13 11-13 19s-4 19-13 19-13-8-13-18c0-9-5-14-12-14-8 0-12 7-12 17v26c0 11-5 20-15 20s-14-9-14-21v-31c0-9-4-15-13-15s-13 7-13 17v9c0 12-5 20-15 20s-14-9-14-21v-19c0-10-5-17-14-17s-13 7-13 17v37c0 12-5 20-15 20s-14-9-14-21v-24c0-10-4-16-13-16s-13 7-13 17v6c0 11-5 19-14 19s-13-8-13-19v-56z" fill="url(#icing)"/>
-  <ellipse cx="310" cy="300" rx="141" ry="33" fill="#fff0dc"/>
-  <g fill="#f6a477"><circle cx="240" cy="305" r="5"/><circle cx="280" cy="318" r="4"/><circle cx="342" cy="308" r="5"/><circle cx="389" cy="293" r="4"/><circle cx="208" cy="294" r="4"/></g>
-  <g fill="#f2bac5"><path d="M244 301v-96c0-4 4-7 8-7s8 3 8 7v96z"/><path d="M302 294V178c0-4 4-7 8-7s8 3 8 7v116z"/><path d="M360 301v-96c0-4 4-7 8-7s8 3 8 7v96z"/></g>
-  <g stroke="#e47c90" stroke-width="3"><path d="M250 213h10m-16 22h16m-16 22h16m42-66h16m-16 22h16m-16 22h16m42-22h16m-16 22h16m-16 22h16"/></g>
-  <g fill="#ffd88e"><path d="M251 188c-12-16 1-23 1-34 11 9 17 24-1 34z"/><path d="M310 160c-13-18 1-27 1-41 13 12 18 28-1 41z"/><path d="M368 188c-12-16 1-23 1-34 11 9 17 24-1 34z"/></g>
-  <g fill="#fff7d9"><circle cx="251" cy="174" r="4"/><circle cx="310" cy="146" r="5"/><circle cx="368" cy="174" r="4"/></g>
+  <ellipse cx="310" cy="300" rx="141" ry="33" fill="#fff7e3"/>
+  <g fill="#cf9c4f"><circle cx="240" cy="305" r="5"/><circle cx="280" cy="318" r="4"/><circle cx="342" cy="308" r="5"/><circle cx="389" cy="293" r="4"/><circle cx="208" cy="294" r="4"/></g>
+  <g fill="#d4aa62"><path d="M244 301v-96c0-4 4-7 8-7s8 3 8 7v96z"/><path d="M302 294V178c0-4 4-7 8-7s8 3 8 7v116z"/><path d="M360 301v-96c0-4 4-7 8-7s8 3 8 7v96z"/></g>
+  <g stroke="#8e6138" stroke-width="3"><path d="M250 213h10m-16 22h16m-16 22h16m42-66h16m-16 22h16m-16 22h16m42-22h16m-16 22h16m-16 22h16"/></g>
+  <g fill="#f1c972"><path d="M251 188c-12-16 1-23 1-34 11 9 17 24-1 34z"/><path d="M310 160c-13-18 1-27 1-41 13 12 18 28-1 41z"/><path d="M368 188c-12-16 1-23 1-34 11 9 17 24-1 34z"/></g>
+  <g fill="#fff2bf"><circle cx="251" cy="174" r="4"/><circle cx="310" cy="146" r="5"/><circle cx="368" cy="174" r="4"/></g>
  </g>
- <g fill="#ffcf9c"><path d="M117 259l5 13 13 5-13 5-5 13-5-13-13-5 13-5z"/><path d="M489 350l4 11 11 4-11 4-4 11-4-11-11-4 11-4z"/></g>
+ <g fill="#e7c779"><path d="M117 259l5 13 13 5-13 5-5 13-5-13-13-5 13-5z"/><path d="M489 350l4 11 11 4-11 4-4 11-4-11-11-4 11-4z"/></g>
 </svg>
