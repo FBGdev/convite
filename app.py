@@ -7,24 +7,21 @@ import io
 import os
 import re
 import secrets
-import sqlite3
 import time
-from contextlib import contextmanager
 from datetime import datetime, timezone
 from functools import wraps
-from pathlib import Path
 from urllib.parse import quote
 from zoneinfo import ZoneInfo
 
 from flask import Flask, Response, abort, flash, redirect, render_template, request, session, url_for
 
 from config import EVENT
+from supabase_store import DuplicatePhone, StoreError, SupabaseStore
 
 
-BASE_DIR = Path(__file__).resolve().parent
-DB_PATH = Path(os.environ.get("DATABASE_PATH", BASE_DIR / "data" / "rsvps.sqlite3"))
 APP_SECRET = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
+store = SupabaseStore()
 
 app = Flask(__name__)
 app.secret_key = APP_SECRET
@@ -36,40 +33,6 @@ app.config.update(
 )
 
 _login_attempts = {}
-
-
-@contextmanager
-def db_connection():
-    connection = sqlite3.connect(DB_PATH, timeout=10)
-    connection.row_factory = sqlite3.Row
-    try:
-        yield connection
-        connection.commit()
-    except Exception:
-        connection.rollback()
-        raise
-    finally:
-        connection.close()
-
-
-def init_db():
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with db_connection() as connection:
-        connection.execute("""
-            CREATE TABLE IF NOT EXISTS rsvps (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                full_name TEXT NOT NULL,
-                phone TEXT NOT NULL UNIQUE,
-                attending INTEGER NOT NULL CHECK (attending IN (0, 1)),
-                companions INTEGER NOT NULL DEFAULT 0 CHECK (companions >= 0),
-                edit_code_hash TEXT NOT NULL,
-                created_at TEXT NOT NULL,
-                updated_at TEXT NOT NULL
-            )
-        """)
-
-
-init_db()
 
 
 def csrf_token():
@@ -163,21 +126,23 @@ def confirm():
         return render_template("invite.html", error=error, form=form, show_edit=bool(code)), 400
 
     now = datetime.now(timezone.utc).isoformat()
-    with db_connection() as connection:
-        existing = connection.execute("SELECT id, edit_code_hash FROM rsvps WHERE phone = ?", (phone,)).fetchone()
+    try:
+        existing = store.by_phone(phone)
         if existing:
             if not code:
                 return render_template("invite.html", error="Este telefone já respondeu. Para alterar a resposta, informe o código de edição recebido na primeira confirmação.", form=form, show_edit=True), 409
             if not hmac.compare_digest(existing["edit_code_hash"], edit_hash(code)):
                 return render_template("invite.html", error="Código de edição incorreto. Confira o código e tente novamente.", form=form, show_edit=True), 403
-            connection.execute("UPDATE rsvps SET full_name = ?, attending = ?, companions = ?, updated_at = ? WHERE id = ?", (name, answer == "yes", companions, now, existing["id"]))
+            store.update(existing["id"], name, answer == "yes", companions, now)
             new_code = None
         else:
             new_code = secrets.token_hex(6).upper()
-            try:
-                connection.execute("INSERT INTO rsvps (full_name, phone, attending, companions, edit_code_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)", (name, phone, answer == "yes", companions, edit_hash(new_code), now, now))
-            except sqlite3.IntegrityError:
-                return render_template("invite.html", error="Este telefone já respondeu. Recarregue a página e use seu código de edição.", form=form, show_edit=True), 409
+            store.create(name, phone, answer == "yes", companions, edit_hash(new_code), now)
+    except DuplicatePhone:
+        return render_template("invite.html", error="Este telefone já respondeu. Recarregue a página e use seu código de edição.", form=form, show_edit=True), 409
+    except StoreError:
+        app.logger.exception("Erro ao salvar confirmação no Supabase")
+        return render_template("invite.html", error="Não foi possível registrar sua resposta agora. Tente novamente em instantes.", form=form, show_edit=bool(code)), 503
 
     return render_template("success.html", attending=answer == "yes", code=new_code, updated=new_code is None)
 
@@ -219,9 +184,18 @@ def admin_logout():
 @admin_required
 def admin_dashboard():
     query = request.args.get("q", "").strip()[:120]
-    with db_connection() as connection:
-        totals = connection.execute("SELECT COUNT(*) AS responses, COALESCE(SUM(attending), 0) AS attending, COALESCE(SUM(CASE WHEN attending = 0 THEN 1 ELSE 0 END), 0) AS declining, COALESCE(SUM(CASE WHEN attending = 1 THEN 1 + companions ELSE 0 END), 0) AS people FROM rsvps").fetchone()
-        rows = connection.execute("SELECT id, full_name, phone, attending, companions, updated_at FROM rsvps WHERE full_name LIKE ? ORDER BY updated_at DESC", (f"%{query}%",)).fetchall()
+    try:
+        all_rows = store.all()
+    except StoreError:
+        app.logger.exception("Erro ao consultar confirmações no Supabase")
+        abort(503, "O painel está indisponível no momento. Tente novamente em instantes.")
+    totals = {
+        "responses": len(all_rows),
+        "attending": sum(bool(row["attending"]) for row in all_rows),
+        "declining": sum(not row["attending"] for row in all_rows),
+        "people": sum(1 + row["companions"] for row in all_rows if row["attending"]),
+    }
+    rows = [row for row in all_rows if query.casefold() in row["full_name"].casefold()]
     return render_template("admin.html", totals=totals, rows=rows, query=query)
 
 
@@ -229,8 +203,11 @@ def admin_dashboard():
 @admin_required
 def admin_delete(rsvp_id):
     require_csrf()
-    with db_connection() as connection:
-        connection.execute("DELETE FROM rsvps WHERE id = ?", (rsvp_id,))
+    try:
+        store.delete(rsvp_id)
+    except StoreError:
+        app.logger.exception("Erro ao excluir confirmação no Supabase")
+        abort(503, "Não foi possível excluir a resposta agora.")
     flash("Resposta excluída.")
     return redirect(url_for("admin_dashboard"))
 
@@ -243,8 +220,11 @@ def csv_safe(value):
 @app.get("/admin/exportar.csv")
 @admin_required
 def admin_export():
-    with db_connection() as connection:
-        rows = connection.execute("SELECT full_name, phone, attending, companions, updated_at FROM rsvps ORDER BY full_name COLLATE NOCASE").fetchall()
+    try:
+        rows = sorted(store.all(), key=lambda row: row["full_name"].casefold())
+    except StoreError:
+        app.logger.exception("Erro ao exportar confirmações do Supabase")
+        abort(503, "Não foi possível exportar a lista agora.")
     output = io.StringIO()
     writer = csv.writer(output, delimiter=";")
     writer.writerow(["Nome", "Telefone", "Resposta", "Acompanhantes", "Data da confirmação"])
