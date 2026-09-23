@@ -17,7 +17,7 @@
   <div class="dashboard-main">
     <div class="dashboard-intro">
       <div><span class="section-label">VISÃO GERAL</span><h1>Quem vem <em>celebrar?</em></h1><p>Veja as respostas recebidas e encontre cada convidado.</p></div>
-      <a class="button button-outline" href="{{ url_for('admin_export') }}">Baixar lista CSV <span aria-hidden="true">↓</span></a>
+      <a class="button button-outline" href="{{ url_for('admin_export') }}">Baixar lista CSV <span class="ui-icon icon-download" aria-hidden="true"></span></a>
     </div>
 
     <div class="stats" aria-label="Resumo das respostas">
@@ -55,7 +55,7 @@
           <tr>
             <td data-label="Convidado"><strong>{{ row.full_name }}</strong></td>
             <td data-label="Telefone"><a class="guest-phone" href="tel:+55{{ row.phone }}">{{ row.phone | br_phone }}</a></td>
-            <td data-label="Resposta"><span class="status {% if row.attending %}status-yes{% else %}status-no{% endif %}"><span aria-hidden="true">●</span> {{ 'Confirmado' if row.attending else 'Não vai' }}</span></td>
+            <td data-label="Resposta"><span class="status {% if row.attending %}status-yes{% else %}status-no{% endif %}">{{ 'Confirmado' if row.attending else 'Não vai' }}</span></td>
             <td data-label="Atualizado em">{{ row.updated_at | br_date }}</td>
             <td class="action-cell"><form method="post" action="{{ url_for('admin_delete', rsvp_id=row.id) }}" onsubmit="return confirm('Excluir esta resposta? Esta ação não pode ser desfeita.')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="delete-button" aria-label="Excluir resposta de {{ row.full_name }}">Excluir resposta</button></form></td>
           </tr>
@@ -64,7 +64,7 @@
         </table>
       </div>
       {% else %}
-      <div class="empty-state"><span aria-hidden="true">✳</span><strong>{% if query or status != 'all' %}Nenhum convidado encontrado{% else %}As respostas vão aparecer aqui{% endif %}</strong><p>{% if query or status != 'all' %}Tente outro nome, telefone ou filtro.{% else %}Compartilhe o link do convite para receber as confirmações.{% endif %}</p>{% if query or status != 'all' %}<a href="{{ url_for('admin_dashboard') }}">Mostrar todos</a>{% endif %}</div>
+      <div class="empty-state"><span class="ui-icon icon-sparkles" aria-hidden="true"></span><strong>{% if query or status != 'all' %}Nenhum convidado encontrado{% else %}As respostas vão aparecer aqui{% endif %}</strong><p>{% if query or status != 'all' %}Tente outro nome, telefone ou filtro.{% else %}Compartilhe o link do convite para receber as confirmações.{% endif %}</p>{% if query or status != 'all' %}<a href="{{ url_for('admin_dashboard') }}">Mostrar todos</a>{% endif %}</div>
       {% endif %}
     </section>
     <div class="dashboard-footer">Convite de {{ event.name }} <span>·</span> Lista privada</div>

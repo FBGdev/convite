@@ -7,16 +7,16 @@
         <div class="eyebrow"><span class="eyebrow-line"></span>VOCÊ ESTÁ CONVIDADO(A)</div>
         <h1 id="hero-title">Vamos celebrar <em>a vida?</em></h1>
         <p class="hero-intro">O aniversário de <strong>{{ event.name }}</strong> está chegando e essa noite só fica completa com você por perto.</p>
-        <a class="button button-primary hero-button" href="#confirmar" data-open-rsvp>Confirmar presença <span aria-hidden="true">↗</span></a>
+        <a class="button button-primary hero-button" href="#rsvp-dialog" data-open-rsvp>Confirmar presença <span class="ui-icon icon-arrow-up-right" aria-hidden="true"></span></a>
         <div class="hero-date"><span>{{ event_day }}</span><span class="date-rule"></span><span>{{ event_month | upper }}<br>{{ event.time }}</span></div>
       </div>
       <div class="hero-art-wrap">
         <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
         <img class="hero-art" src="{{ url_for('static', filename='birthday-art.svg') }}" alt="Ilustração de um bolo de aniversário com velas e estrelas">
-        <span class="art-caption">A NOITE É NOSSA ✦</span>
+        <span class="art-caption">A NOITE É NOSSA <span class="ui-icon icon-sparkles" aria-hidden="true"></span></span>
       </div>
     </div>
-    <div class="hero-bottom"><span>UMA DATA ESPECIAL PARA GUARDAR</span><span class="scroll-cue">DESLIZE PARA VER MAIS ↓</span></div>
+    <div class="hero-bottom"><span>UMA DATA ESPECIAL PARA GUARDAR</span><span class="scroll-cue">DESLIZE PARA VER MAIS <span class="ui-icon icon-arrow-down" aria-hidden="true"></span></span></div>
   </section>
 
   <section class="details" aria-labelledby="details-title">
@@ -24,8 +24,8 @@
     <div class="details-grid">
       <div class="details-heading"><h2 id="details-title">Marque na<br><em>agenda.</em></h2><p>{{ event.message }}</p></div>
       <div class="detail-list">
-        <div class="detail-item"><div class="detail-icon" aria-hidden="true">✳</div><div><span class="detail-kicker">QUANDO</span><strong>{{ event_weekday | title }}, {{ event_day }} de {{ event_month }}</strong><span>A partir das {{ event.time }}</span></div></div>
-        <div class="detail-item"><div class="detail-icon" aria-hidden="true">⌖</div><div><span class="detail-kicker">ONDE</span><strong>{{ event.venue }}</strong><span>{{ event.address }}</span><a href="{{ maps_url }}" target="_blank" rel="noopener noreferrer">Abrir no Google Maps ↗</a></div></div>
+        <div class="detail-item"><div class="detail-icon" aria-hidden="true"><span class="ui-icon icon-calendar-days"></span></div><div><span class="detail-kicker">QUANDO</span><strong>{{ event_weekday | title }}, {{ event_day }} de {{ event_month }}</strong><span>A partir das {{ event.time }}</span></div></div>
+        <div class="detail-item"><div class="detail-icon" aria-hidden="true"><span class="ui-icon icon-map-pin"></span></div><div><span class="detail-kicker">ONDE</span><strong>{{ event.venue }}</strong><span>{{ event.address }}</span><a href="{{ maps_url }}" target="_blank" rel="noopener noreferrer">Abrir no Google Maps <span class="ui-icon icon-arrow-up-right" aria-hidden="true"></span></a></div></div>
       </div>
     </div>
     <div class="location-map" aria-labelledby="location-map-title">
@@ -33,7 +33,7 @@
         <span class="section-label">COMO CHEGAR</span>
         <h3 id="location-map-title">Seu caminho até <em>a festa.</em></h3>
         <p><strong>{{ event.venue }}</strong><br>{{ event.address }}</p>
-        <a class="button button-dark" href="{{ directions_url }}" target="_blank" rel="noopener noreferrer">Traçar rota <span aria-hidden="true">↗</span></a>
+        <a class="button button-dark" href="{{ directions_url }}" target="_blank" rel="noopener noreferrer">Traçar rota <span class="ui-icon icon-arrow-up-right" aria-hidden="true"></span></a>
       </div>
       <div class="location-map-frame">
         <iframe title="Mapa do local da festa: {{ event.venue }}" src="{{ map_embed_url }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
@@ -50,13 +50,8 @@
   </section>
   {% endif %}
 
-  <section class="rsvp" id="confirmar" aria-labelledby="rsvp-title">
-    <div class="rsvp-inner">
-      <div class="rsvp-aside"><div class="section-label">SUA RESPOSTA</div><h2 id="rsvp-title">Conta pra gente:<br><em>você vem?</em></h2><p>Leva menos de um minuto. Sua resposta ajuda a preparar tudo com carinho.</p><div class="rsvp-spark" aria-hidden="true">✳</div></div>
-      <div class="rsvp-prompt"><span class="section-label">CONFIRMAÇÃO</span><p>Já sabe se vai? Responda pelo formulário para ajudar a organizar a festa.</p><a class="button button-dark" href="#confirmar" data-open-rsvp>Abrir formulário <span aria-hidden="true">↗</span></a></div>
-    </div>
-    <dialog id="rsvp-dialog" class="rsvp-dialog" aria-labelledby="rsvp-dialog-title" data-open-on-load="{{ 'true' if error else 'false' }}">
-      <div class="rsvp-dialog-header"><div><span class="section-label">SUA RESPOSTA</span><h2 id="rsvp-dialog-title">Confirme sua <em>presença.</em></h2></div><button class="rsvp-close" type="button" aria-label="Fechar formulário" data-close-rsvp>×</button></div>
+  <dialog id="rsvp-dialog" class="rsvp-dialog" aria-labelledby="rsvp-dialog-title" data-open-on-load="{{ 'true' if error else 'false' }}">
+      <div class="rsvp-dialog-header"><div><span class="section-label">SUA RESPOSTA</span><h2 id="rsvp-dialog-title">Confirme sua <em>presença.</em></h2></div><button class="rsvp-close" type="button" aria-label="Fechar formulário" data-close-rsvp><span class="ui-icon icon-x" aria-hidden="true"></span></button></div>
       <form class="rsvp-form" method="post" action="{{ url_for('confirm') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         {% if error %}<div class="form-error" role="alert" tabindex="-1">{{ error }}</div>{% endif %}
@@ -66,17 +61,16 @@
         <input id="phone" name="phone" type="tel" autocomplete="tel-national" inputmode="numeric" maxlength="15" required placeholder="(11) 99999-9999" aria-describedby="phone-hint" value="{{ form.phone if form else '' }}">
         <small id="phone-hint" class="input-hint">Apenas DDD e número, sem +55.</small>
         <fieldset class="choice-group"><legend>Você vai comparecer? <span>*</span></legend>
-          <label class="choice"><input type="radio" name="attending" value="yes" required {% if form and form.attending == 'yes' %}checked{% endif %}><span class="choice-mark"></span><span>Sim, vou! <span aria-hidden="true">🎉</span></span></label>
+          <label class="choice"><input type="radio" name="attending" value="yes" required {% if form and form.attending == 'yes' %}checked{% endif %}><span class="choice-mark"></span><span>Sim, vou! <span class="ui-icon icon-party-popper" aria-hidden="true"></span></span></label>
           <label class="choice"><input type="radio" name="attending" value="no" {% if form and form.attending == 'no' %}checked{% endif %}><span class="choice-mark"></span><span>Infelizmente, não poderei ir</span></label>
         </fieldset>
-        <div id="edit-field" class="edit-field {% if not show_edit %}is-hidden{% endif %}"><label for="edit_code">Código de edição</label><input id="edit_code" name="edit_code" type="text" autocomplete="off" maxlength="12" placeholder="Código recebido antes"><small>Preencha somente se você já respondeu com este telefone.</small></div>
-        <button class="button button-dark" type="submit">Enviar resposta <span aria-hidden="true">↗</span></button>
+        <div id="edit-field" class="edit-field"><label for="edit_code">Código de edição <span class="optional-label">(se já respondeu)</span></label><input id="edit_code" name="edit_code" type="text" autocomplete="off" maxlength="12" placeholder="Código da primeira resposta"><small>Para alterar sua resposta, informe o mesmo telefone e o código mostrado na primeira confirmação. Se é sua primeira resposta, deixe em branco.</small></div>
+        <button class="button button-dark" type="submit">Enviar resposta <span class="ui-icon icon-arrow-up-right" aria-hidden="true"></span></button>
         <p class="form-footnote">Seus dados serão usados apenas para organizar esta festa.</p>
       </form>
-    </dialog>
-    <noscript><style>#rsvp-dialog:not([open]){display:block;position:static;width:min(100%,580px);height:auto;max-width:none;max-height:none;margin:30px auto 0;overflow:visible}.rsvp-close{display:none}</style></noscript>
-  </section>
+  </dialog>
+  <noscript><style>#rsvp-dialog:not([open]){display:block;position:static;width:min(100%,580px);height:auto;max-width:none;max-height:none;margin:30px auto;overflow:visible}.rsvp-close{display:none}</style></noscript>
 </main>
-<footer class="public-footer"><span>FEITO COM CARINHO PARA CELEBRAR {{ event.name | upper }} ✳</span><a href="{{ url_for('admin_login') }}">Área da aniversariante</a></footer>
+<footer class="public-footer"><span>FEITO COM CARINHO PARA CELEBRAR {{ event.name | upper }} <span class="ui-icon icon-sparkles" aria-hidden="true"></span></span><a href="{{ url_for('admin_login') }}">Área da aniversariante</a></footer>
 <script src="{{ url_for('static', filename='invite.js') }}" defer></script>
 {% endblock %}

@@ -125,26 +125,26 @@ def confirm():
         error = "Selecione se você vai comparecer."
 
     if error:
-        return render_template("invite.html", error=error, form=form, show_edit=bool(code)), 400
+        return render_template("invite.html", error=error, form=form), 400
 
     now = datetime.now(timezone.utc).isoformat()
     try:
         existing = store.by_phone(phone)
         if existing:
             if not code:
-                return render_template("invite.html", error="Este telefone já respondeu. Para alterar a resposta, informe o código de edição recebido na primeira confirmação.", form=form, show_edit=True), 409
+                return render_template("invite.html", error="Este telefone já respondeu. Para alterar a resposta, informe o código de edição recebido na primeira confirmação.", form=form), 409
             if not hmac.compare_digest(existing["edit_code_hash"], edit_hash(code)):
-                return render_template("invite.html", error="Código de edição incorreto. Confira o código e tente novamente.", form=form, show_edit=True), 403
+                return render_template("invite.html", error="Código de edição incorreto. Confira o código e tente novamente.", form=form), 403
             store.update(existing["id"], name, answer == "yes", now)
             new_code = None
         else:
             new_code = secrets.token_hex(6).upper()
             store.create(name, phone, answer == "yes", edit_hash(new_code), now)
     except DuplicatePhone:
-        return render_template("invite.html", error="Este telefone já respondeu. Recarregue a página e use seu código de edição.", form=form, show_edit=True), 409
+        return render_template("invite.html", error="Este telefone já respondeu. Recarregue a página e use seu código de edição.", form=form), 409
     except StoreError:
         app.logger.exception("Erro ao salvar confirmação no Supabase")
-        return render_template("invite.html", error="Não foi possível registrar sua resposta agora. Tente novamente em instantes.", form=form, show_edit=bool(code)), 503
+        return render_template("invite.html", error="Não foi possível registrar sua resposta agora. Tente novamente em instantes.", form=form), 503
 
     return render_template("success.html", attending=answer == "yes", code=new_code, updated=new_code is None)
 

@@ -121,13 +121,26 @@ class InviteFlowTest(unittest.TestCase):
     def test_invite_has_no_companion_fields(self):
         page = self.client.get("/").get_data(as_text=True)
         self.assertIn('<dialog id="rsvp-dialog"', page)
-        self.assertEqual(page.count('data-open-rsvp'), 2)
+        self.assertEqual(page.count('data-open-rsvp'), 1)
+        self.assertNotIn('class="rsvp-prompt"', page)
+        self.assertNotIn('<section class="rsvp"', page)
+        self.assertIn('id="edit-field" class="edit-field"', page)
         self.assertNotIn('name="companions"', page)
         self.assertNotIn('name="children"', page)
         self.assertNotIn('name="adult_names"', page)
         self.assertIn(self.module.EVENT["maps_url"], page)
         self.assertIn('title="Mapa do local da festa:', page)
         self.assertIn('Traçar rota', page)
+
+    def test_invite_icons_are_local_svg(self):
+        page = self.client.get("/").get_data(as_text=True)
+        self.assertIn('icon-party-popper', page)
+        self.assertNotIn('🎉', page)
+        for icon in ("party-popper", "calendar-days", "map-pin", "arrow-up-right", "x"):
+            response = self.client.get(f"/static/icons/{icon}.svg")
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b"<svg", response.data)
+            response.close()
 
 
 class SupabaseRequestTest(unittest.TestCase):

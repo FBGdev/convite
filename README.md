@@ -6,6 +6,8 @@ Site de convite com confirmação de presença, banco Supabase e painel privado.
 
 Edite `config.py`: nome, data (`AAAA-MM-DD`), horário, local, endereço, link do Google Maps, coordenadas do mapa, mensagem e chave Pix. A arte está em `static/birthday-art.svg`; as cores e fontes, em `static/style.css`. A variável de ambiente `PIX_KEY` pode substituir a chave definida em `config.py`. A seção de presentes fica oculta se ambas estiverem vazias.
 
+Os ícones SVG locais em `static/icons/` são do [Lucide](https://lucide.dev/) e seguem a licença incluída em `static/icons/LICENSE`.
+
 Confira os dados da festa antes de compartilhar o link.
 
 ## Configurar o Supabase
