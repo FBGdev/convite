@@ -4,7 +4,7 @@ Site de convite com confirmação de presença, banco Supabase e painel privado.
 
 ## Personalizar a festa
 
-Edite `config.py`: nome, data (`AAAA-MM-DD`), horário, local, endereço, link do Google Maps, coordenadas do mapa, mensagem e chave Pix. A arte está em `static/birthday-art.svg`; as cores e fontes, em `static/style.css`. A variável de ambiente `PIX_KEY` pode substituir a chave definida em `config.py`. A seção de presentes fica oculta se ambas estiverem vazias.
+Edite `config.py`: nome, data (`AAAA-MM-DD`), horário, local, endereço, link do Google Maps, coordenadas do mapa, mensagem e chave Pix. A abertura tipográfica e a seção de presentes estão em `templates/invite.html`; as cores e fontes, em `static/style.css`. A variável de ambiente `PIX_KEY` pode substituir a chave definida em `config.py`. Sem chave Pix, apenas essa opção fica oculta; as sugestões de roupas e perfumes continuam visíveis.
 
 Os ícones SVG locais em `static/icons/` são do [Lucide](https://lucide.dev/) e seguem a licença incluída em `static/icons/LICENSE`.
 
@@ -54,7 +54,7 @@ As respostas ficam no Supabase e continuam disponíveis depois que o contêiner 
 - Cada resposta registra apenas a pessoa que preenche o formulário; o convite não oferece opção de adicionar acompanhantes.
 - O formulário de confirmação abre em uma janela que ocupa a tela no celular; erros de validação reabrem a janela com os dados preenchidos.
 - O convite mostra um mapa do salão, um link para a página do local e um botão para traçar a rota pelo Google Maps.
-- A chave Pix é opcional e aparece no convite e na página de resposta recebida quando estiver definida em `config.py` ou em `PIX_KEY`. Qualquer visitante poderá copiá-la.
+- A chave Pix é opcional e aparece no convite dentro de "Sugestões de presente" quando estiver definida em `config.py` ou em `PIX_KEY`. Qualquer visitante poderá copiá-la ao abrir essa opção.
 - Uma resposta repetida com o mesmo telefone é recusada. Se o convidado precisar corrigir a resposta, a organizadora pode excluir o registro no painel para permitir uma nova confirmação.
 - O painel mostra os totais, busca por nome, exclui respostas e exporta CSV. A lista nunca é exposta na página pública.
 - Defina uma senha forte no servidor. Sem `ADMIN_PASSWORD`, o painel não aceita login. `SECRET_KEY` deve permanecer estável entre reinícios para manter as sessões válidas.

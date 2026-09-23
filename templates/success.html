@@ -8,19 +8,7 @@
     <h1>{% if attending %}Presença <em>confirmada!</em>{% else %}Obrigado por <em>avisar.</em>{% endif %}</h1>
     <p>{% if attending %}Estamos esperando você para comemorar esse dia especial!{% else %}Sentiremos sua falta, mas agradecemos por responder. Esperamos celebrar juntos em outra ocasião!{% endif %}</p>
 
-    {% if event.pix_key %}
-    <section class="success-pix" aria-labelledby="success-pix-title">
-      <span class="section-label">PRESENTE OPCIONAL</span>
-      <h2 id="success-pix-title">Seu carinho já é um presente.</h2>
-      <p>Se quiser presentear a {{ event.name }}, você pode usar esta chave Pix:</p>
-      <strong id="pix-key">{{ event.pix_key }}</strong>
-      <button id="copy-pix" type="button">Copiar chave Pix</button>
-      <small id="copy-pix-status" role="status" aria-live="polite"></small>
-    </section>
-    {% endif %}
-
     <a class="button button-dark" href="{{ url_for('invite') }}">Voltar ao convite <span class="ui-icon icon-arrow-up-right" aria-hidden="true"></span></a>
   </div>
 </main>
-{% if event.pix_key %}<script src="{{ url_for('static', filename='pix.js') }}" defer></script>{% endif %}
 {% endblock %}

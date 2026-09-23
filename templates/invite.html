@@ -4,19 +4,14 @@
   <section class="hero" aria-labelledby="hero-title">
     <div class="hero-inner">
       <div class="hero-copy">
-        <div class="eyebrow"><span class="eyebrow-line"></span>VOCÊ ESTÁ CONVIDADO(A)</div>
-        <h1 id="hero-title">Vamos celebrar <em>a vida?</em></h1>
-        <p class="hero-intro">O aniversário de <strong>{{ event.name }}</strong> está chegando e essa noite só fica completa com você por perto.</p>
-        <a class="button button-primary hero-button" href="#rsvp-dialog" data-open-rsvp>Confirmar presença <span class="ui-icon icon-arrow-up-right" aria-hidden="true"></span></a>
-        <div class="hero-date"><span>{{ event_day }}</span><span class="date-rule"></span><span>{{ event_month | upper }}<br>{{ event.time }}</span></div>
-      </div>
-      <div class="hero-art-wrap">
-        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
-        <img class="hero-art" src="{{ url_for('static', filename='birthday-art.svg') }}" alt="Ilustração de um bolo de aniversário com velas e estrelas">
-        <span class="art-caption">A NOITE É NOSSA <span class="ui-icon icon-sparkles" aria-hidden="true"></span></span>
+        <h1 id="hero-title"><span class="hero-name">{{ event.name }}</span><span class="hero-age">30</span></h1>
+        <p class="hero-date">{{ event_short_date }} · {{ event_short_time }}</p>
+        <p class="hero-tagline">Uma noite para brindar a vida</p>
+        <a class="button button-primary hero-button" href="#rsvp-dialog" data-open-rsvp>CONFIRMAR PRESENÇA <span class="ui-icon icon-arrow-up-right" aria-hidden="true"></span></a>
+        <a class="hero-scroll-hint" href="#details-title">ROLE PARA VER MAIS <span class="ui-icon icon-arrow-down" aria-hidden="true"></span></a>
       </div>
     </div>
-    <div class="hero-bottom"><span>UMA DATA ESPECIAL PARA GUARDAR</span><span class="scroll-cue">DESLIZE PARA VER MAIS <span class="ui-icon icon-arrow-down" aria-hidden="true"></span></span></div>
+    <div class="hero-bottom"><span>{{ event.name | upper }} · 30 ANOS</span></div>
   </section>
 
   <section class="details" aria-labelledby="details-title">
@@ -41,14 +36,18 @@
     </div>
   </section>
 
-  {% if event.pix_key %}
   <section class="gifts" aria-labelledby="gifts-title">
     <div class="gifts-inner">
-      <div><span class="section-label">PRESENTES</span><h2 id="gifts-title">Sua presença já é <em>um presente.</em></h2><p>Se quiser presentear a {{ event.name }}, você também pode usar a chave Pix abaixo. Fique à vontade.</p></div>
-      <div class="pix-card"><span>CHAVE PIX</span><strong id="pix-key">{{ event.pix_key }}</strong><button id="copy-pix" type="button" aria-label="Copiar chave Pix">Copiar chave Pix</button><small id="copy-pix-status" role="status" aria-live="polite"></small></div>
+      <div class="gifts-heading"><span class="section-label">UM CARINHO A MAIS</span><h2 id="gifts-title">Sugestões de <em>presente.</em></h2><p>Sua presença já é especial. Se quiser me presentear, estas são algumas ideias que vou adorar.</p></div>
+      <div class="gift-options">
+        <div class="gift-option"><span>01</span><strong>Roupas</strong></div>
+        <div class="gift-option"><span>02</span><strong>Perfumes</strong></div>
+        {% if event.pix_key %}
+        <details class="gift-option gift-pix"><summary><span>03</span><strong>Pix</strong><span class="gift-expand" aria-hidden="true">+</span></summary><div class="gift-pix-content"><p>Se preferir, esta também é uma opção.</p><strong id="pix-key">{{ event.pix_key }}</strong><button id="copy-pix" type="button" aria-label="Copiar chave Pix">Copiar chave Pix</button><small id="copy-pix-status" role="status" aria-live="polite"></small></div></details>
+        {% endif %}
+      </div>
     </div>
   </section>
-  {% endif %}
 
   <dialog id="rsvp-dialog" class="rsvp-dialog" aria-labelledby="rsvp-dialog-title" data-open-on-load="{{ 'true' if error else 'false' }}">
       <div class="rsvp-dialog-header"><div><span class="section-label">SUA RESPOSTA</span><h2 id="rsvp-dialog-title">Confirme sua <em>presença.</em></h2></div><button class="rsvp-close" type="button" aria-label="Fechar formulário" data-close-rsvp><span class="ui-icon icon-x" aria-hidden="true"></span></button></div>

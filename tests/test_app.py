@@ -56,12 +56,12 @@ class InviteFlowTest(unittest.TestCase):
         self.client.get("/admin/entrar")
         return self.client.post("/admin/entrar", data={"csrf_token": self.csrf(), "password": "test-admin-password"})
 
-    def test_confirmation_duplicate_and_pix_gift(self):
+    def test_confirmation_duplicate_without_gift_prompt(self):
         first = self.submit()
         self.assertEqual(first.status_code, 200)
         self.assertIn("Presença <em>confirmada!</em>".encode(), first.data)
-        self.assertIn(self.module.EVENT["pix_key"].encode(), first.data)
-        self.assertIn(b'id="copy-pix"', first.data)
+        self.assertNotIn(self.module.EVENT["pix_key"].encode(), first.data)
+        self.assertNotIn(b'id="copy-pix"', first.data)
         self.assertNotIn("CÓDIGO DE EDIÇÃO".encode(), first.data)
         self.assertEqual(self.submit(phone="+55 11 99999-1234").status_code, 409)
         self.assertEqual(self.submit(attending="no", edit_code="WRONGCODE").status_code, 409)
@@ -127,6 +127,18 @@ class InviteFlowTest(unittest.TestCase):
         self.assertIn(self.module.EVENT["maps_url"], page)
         self.assertIn('title="Mapa do local da festa:', page)
         self.assertIn('Traçar rota', page)
+
+    def test_invite_uses_typographic_opening_and_gift_suggestions(self):
+        page = self.client.get("/").get_data(as_text=True)
+        self.assertIn('<span class="hero-age">30</span>', page)
+        self.assertIn('22.10.2026 · 19H', page)
+        self.assertIn('Uma noite para brindar a vida', page)
+        self.assertNotIn('birthday-art.svg', page)
+        self.assertNotIn('VOCÊ ESTÁ CONVIDADO(A)', page)
+        self.assertIn('Sugestões de <em>presente.</em>', page)
+        self.assertIn('<strong>Roupas</strong>', page)
+        self.assertIn('<strong>Perfumes</strong>', page)
+        self.assertIn('<details class="gift-option gift-pix">', page)
 
     def test_invite_icons_are_local_svg(self):
         page = self.client.get("/").get_data(as_text=True)

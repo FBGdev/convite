@@ -88,6 +88,8 @@ def event_context():
     return {
         "event": EVENT,
         "event_day": date.strftime("%d"),
+        "event_short_date": date.strftime("%d.%m.%Y"),
+        "event_short_time": EVENT["time"].replace(":00", "H"),
         "event_month": ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"][date.month - 1],
         "event_weekday": ["segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado", "domingo"][date.weekday()],
         "maps_url": EVENT.get("maps_url") or "https://www.google.com/maps/search/?api=1&query=" + quote(EVENT["address"]),
