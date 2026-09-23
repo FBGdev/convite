@@ -42,8 +42,9 @@
       <div class="gift-options">
         <div class="gift-option"><span>01</span><strong>Roupas</strong></div>
         <div class="gift-option"><span>02</span><strong>Perfumes</strong></div>
+        <div class="gift-option"><span>03</span><strong>Bolsas e Acessórios</strong></div>
         {% if event.pix_key %}
-        <details class="gift-option gift-pix"><summary><span>03</span><strong>Pix</strong><span class="gift-expand" aria-hidden="true">+</span></summary><div class="gift-pix-content"><p>Se preferir, esta também é uma opção.</p><strong id="pix-key">{{ event.pix_key }}</strong><button id="copy-pix" type="button" aria-label="Copiar chave Pix">Copiar chave Pix</button><small id="copy-pix-status" role="status" aria-live="polite"></small></div></details>
+        <details class="gift-option gift-pix"><summary><span>04</span><strong>Pix</strong><span class="gift-expand" aria-hidden="true">+</span></summary><div class="gift-pix-content"><p>Se preferir, esta também é uma opção.</p><strong id="pix-key">{{ event.pix_key }}</strong><button id="copy-pix" type="button" aria-label="Copiar chave Pix">Copiar chave Pix</button><small id="copy-pix-status" role="status" aria-live="polite"></small></div></details>
         {% endif %}
       </div>
     </div>

@@ -138,6 +138,8 @@ class InviteFlowTest(unittest.TestCase):
         self.assertIn('Sugestões de <em>presente.</em>', page)
         self.assertIn('<strong>Roupas</strong>', page)
         self.assertIn('<strong>Perfumes</strong>', page)
+        self.assertIn('<strong>Bolsas e Acessórios</strong>', page)
+        self.assertIn('<summary><span>04</span><strong>Pix</strong>', page)
         self.assertIn('<details class="gift-option gift-pix">', page)
 
     def test_invite_icons_are_local_svg(self):
