@@ -40,12 +40,13 @@
     <div class="gifts-inner">
       <div class="gifts-heading"><span class="section-label">UM CARINHO A MAIS</span><h2 id="gifts-title">Sugestões de <em>presente.</em></h2><p>Sua presença já é especial. Se quiser me presentear, estas são algumas ideias que vou adorar.</p></div>
       <div class="gift-options">
-        <div class="gift-option"><span>01</span><strong>Roupas</strong></div>
+        <div class="gift-option"><span>01</span><div class="gift-option-copy"><strong>Roupas</strong><small>Parte superior: G · Parte inferior: 44</small></div></div>
         <div class="gift-option"><span>02</span><strong>Perfumes</strong></div>
         <div class="gift-option"><span>03</span><strong>Bolsas e Acessórios</strong></div>
         {% if event.pix_key %}
         <details class="gift-option gift-pix"><summary><span>04</span><strong>Pix</strong><span class="gift-expand" aria-hidden="true">+</span></summary><div class="gift-pix-content"><p>Se preferir, esta também é uma opção.</p><strong id="pix-key">{{ event.pix_key }}</strong><button id="copy-pix" type="button" aria-label="Copiar chave Pix">Copiar chave Pix</button><small id="copy-pix-status" role="status" aria-live="polite"></small></div></details>
         {% endif %}
+        <p class="drink-reminder">Cada pessoa que for consumir bebida alcoólica deve levar a sua.</p>
       </div>
     </div>
   </section>
@@ -64,6 +65,23 @@
           <label class="choice"><input type="radio" name="attending" value="yes" required {% if form and form.attending == 'yes' %}checked{% endif %}><span class="choice-mark"></span><span>Sim, vou! <span class="ui-icon icon-party-popper" aria-hidden="true"></span></span></label>
           <label class="choice"><input type="radio" name="attending" value="no" {% if form and form.attending == 'no' %}checked{% endif %}><span class="choice-mark"></span><span>Infelizmente, não poderei ir</span></label>
         </fieldset>
+        <fieldset class="family-fields" id="family-fields">
+          <legend>Quem vai com você?</legend>
+          <p>Você pode incluir sua esposa e até dois filhos.</p>
+          <label class="family-checkbox" for="bring_wife"><input id="bring_wife" name="bring_wife" type="checkbox" value="yes" {% if form and form.bring_wife == 'yes' %}checked{% endif %}> Vou levar minha esposa</label>
+          <div id="wife-field" class="family-name-field">
+            <label for="wife_name">Nome da esposa</label>
+            <input id="wife_name" name="wife_name" type="text" minlength="2" maxlength="120" autocomplete="off" value="{{ form.wife_name if form else '' }}">
+          </div>
+          <div class="children-heading"><strong>Filhos</strong><button id="add-child" class="family-action" type="button" hidden>+ Adicionar filho</button></div>
+          {% for index in range(2) %}
+          <div class="child-row" data-child-row>
+            <label for="child_name_{{ index + 1 }}">Nome do filho {{ index + 1 }}</label>
+            <div class="child-input-line"><input id="child_name_{{ index + 1 }}" name="child_names" type="text" minlength="2" maxlength="120" autocomplete="off" value="{{ form.child_names[index] if form and form.child_names | length > index else '' }}"><button class="family-action remove-child" type="button" aria-label="Remover filho {{ index + 1 }}" hidden>Remover</button></div>
+          </div>
+          {% endfor %}
+        </fieldset>
+        <p class="drink-reminder drink-reminder-form">Cada pessoa que for consumir bebida alcoólica deve levar a sua.</p>
         <button class="button button-dark" type="submit">Enviar resposta <span class="ui-icon icon-arrow-up-right" aria-hidden="true"></span></button>
         <p class="form-footnote">Seus dados serão usados apenas para organizar esta festa.</p>
       </form>

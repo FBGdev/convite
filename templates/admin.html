@@ -22,7 +22,7 @@
 
     <div class="stats" aria-label="Resumo das respostas">
       <div class="stat"><span>RESPOSTAS</span><strong>{{ totals.responses }}</strong><small>Pessoas que responderam</small></div>
-      <div class="stat stat-highlight"><span>VÃO À FESTA</span><strong>{{ totals.attending }}</strong><small>Presenças confirmadas</small></div>
+      <div class="stat stat-highlight"><span>VÃO À FESTA</span><strong>{{ totals.attending }}</strong><small>Pessoas confirmadas</small></div>
       <div class="stat"><span>NÃO VÃO</span><strong>{{ totals.declining }}</strong><small>Respostas negativas</small></div>
     </div>
 
@@ -49,12 +49,13 @@
       {% if rows %}
       <div class="table-scroll">
         <table class="guest-table">
-          <thead><tr><th>CONVIDADO</th><th>TELEFONE</th><th>RESPOSTA</th><th>ATUALIZADO EM</th><th><span class="sr-only">Ações</span></th></tr></thead>
+          <thead><tr><th>CONVIDADO</th><th>TELEFONE</th><th>FAMÍLIA</th><th>RESPOSTA</th><th>ATUALIZADO EM</th><th><span class="sr-only">Ações</span></th></tr></thead>
           <tbody>
           {% for row in rows %}
           <tr>
             <td data-label="Convidado"><strong>{{ row.full_name }}</strong></td>
             <td data-label="Telefone"><a class="guest-phone" href="tel:+55{{ row.phone }}">{{ row.phone | br_phone }}</a></td>
+            <td data-label="Família"><div class="family-names">{% if row.wife_name %}<span>Esposa: {{ row.wife_name }}</span>{% endif %}{% for child in row.children_names or [] %}<span>Filho {{ loop.index }}: {{ child }}</span>{% endfor %}{% if not row.wife_name and not row.children_names %}<span>—</span>{% endif %}</div></td>
             <td data-label="Resposta"><span class="status {% if row.attending %}status-yes{% else %}status-no{% endif %}">{{ 'Confirmado' if row.attending else 'Não vai' }}</span></td>
             <td data-label="Atualizado em">{{ row.updated_at | br_date }}</td>
             <td class="action-cell"><form method="post" action="{{ url_for('admin_delete', rsvp_id=row.id) }}" onsubmit="return confirm('Excluir esta resposta? Esta ação não pode ser desfeita.')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="delete-button" aria-label="Excluir resposta de {{ row.full_name }}">Excluir resposta</button></form></td>

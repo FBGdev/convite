@@ -54,3 +54,58 @@ phoneInput?.addEventListener('input', () => {
 });
 
 if (phoneInput?.value) phoneInput.value = maskBrazilianPhone(phoneInput.value);
+
+const familyFields = document.getElementById('family-fields');
+const wifeCheckbox = document.getElementById('bring_wife');
+const wifeField = document.getElementById('wife-field');
+const wifeInput = document.getElementById('wife_name');
+const addChildButton = document.getElementById('add-child');
+const childRows = [...document.querySelectorAll('[data-child-row]')];
+const activeChildren = new Set(childRows.filter(row => row.querySelector('input').value.trim()));
+
+function updateFamilyFields() {
+  if (!familyFields) return;
+  const attending = document.querySelector('input[name="attending"]:checked')?.value === 'yes';
+  familyFields.hidden = !attending;
+  familyFields.disabled = !attending;
+  wifeField.hidden = !wifeCheckbox.checked;
+  wifeInput.disabled = !attending || !wifeCheckbox.checked;
+  wifeInput.required = attending && wifeCheckbox.checked;
+  let childNumber = 0;
+  childRows.forEach(row => {
+    const active = activeChildren.has(row);
+    const input = row.querySelector('input');
+    row.hidden = !active;
+    input.disabled = !attending || !active;
+    input.required = attending && active;
+    const removeButton = row.querySelector('.remove-child');
+    removeButton.hidden = !active;
+    if (active) {
+      childNumber += 1;
+      row.querySelector('label').textContent = `Nome do filho ${childNumber}`;
+      removeButton.setAttribute('aria-label', `Remover filho ${childNumber}`);
+    }
+  });
+  addChildButton.hidden = !attending || activeChildren.size >= 2;
+}
+
+document.querySelectorAll('input[name="attending"]').forEach(input => {
+  input.addEventListener('change', updateFamilyFields);
+});
+wifeCheckbox?.addEventListener('change', updateFamilyFields);
+addChildButton?.addEventListener('click', () => {
+  const row = childRows.find(item => !activeChildren.has(item));
+  if (!row) return;
+  activeChildren.add(row);
+  updateFamilyFields();
+  row.querySelector('input').focus();
+});
+childRows.forEach(row => {
+  row.querySelector('.remove-child').addEventListener('click', () => {
+    row.querySelector('input').value = '';
+    activeChildren.delete(row);
+    updateFamilyFields();
+    addChildButton.focus();
+  });
+});
+updateFamilyFields();

@@ -54,13 +54,15 @@ class SupabaseStore:
         rows = self._request(params={"select": "id", "phone": f"eq.{phone}", "limit": "1"})
         return rows[0] if rows else None
 
-    def create(self, full_name, phone, attending, now):
+    def create(self, full_name, phone, attending, wife_name, children_names, now):
         self._request("POST", payload={
             "full_name": full_name,
             "phone": phone,
             "attending": attending,
-            "companions": 0,
-            "children": 0,
+            "wife_name": wife_name,
+            "children_names": children_names,
+            "companions": 1 if wife_name else 0,
+            "children": len(children_names),
             "created_at": now,
             "updated_at": now,
         })
@@ -70,7 +72,7 @@ class SupabaseStore:
         offset = 0
         while True:
             batch = self._request(params={
-                "select": "id,full_name,phone,attending,updated_at",
+                "select": "id,full_name,phone,attending,wife_name,children_names,companions,children,updated_at",
                 "order": "updated_at.desc,id.desc",
                 "limit": "500",
                 "offset": str(offset),
