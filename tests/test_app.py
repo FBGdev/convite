@@ -140,7 +140,7 @@ class InviteFlowTest(unittest.TestCase):
         page = self.client.get("/").get_data(as_text=True)
         self.assertIn('<span class="hero-age">30</span>', page)
         self.assertIn('22.10.2026 · 19H', page)
-        self.assertIn('Uma noite para brindar a vida', page)
+        self.assertIn('Uma noite para celebrar brindar e sambar', page)
         self.assertNotIn('birthday-art.svg', page)
         self.assertNotIn('VOCÊ ESTÁ CONVIDADO(A)', page)
         self.assertIn('Sugestões de <em>presente.</em>', page)

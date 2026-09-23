@@ -4,7 +4,7 @@ Site de convite com confirmação de presença, banco Supabase e painel privado.
 
 ## Personalizar a festa
 
-Edite `config.py`: nome, data (`AAAA-MM-DD`), horário, local, endereço, link do Google Maps, coordenadas do mapa, mensagem e chave Pix. A abertura tipográfica, as sugestões de presente, os tamanhos de roupa e o aviso sobre bebidas estão em `templates/invite.html`; o aviso também aparece em `templates/success.html` para quem confirma presença. A imagem de fundo do hero está em `static/images/fundo.png`, e suas cores e posição ficam em `static/style.css`. A variável de ambiente `PIX_KEY` pode substituir a chave definida em `config.py`. Sem chave Pix, apenas essa opção fica oculta; as sugestões de roupas e perfumes continuam visíveis.
+Edite `config.py`: nome, data (`AAAA-MM-DD`), horário, local, endereço, link do Google Maps, coordenadas do mapa, mensagem e chave Pix. A abertura tipográfica, as sugestões de presente, os tamanhos de roupa e o aviso sobre bebidas estão em `templates/invite.html`; o aviso também aparece em `templates/success.html` para quem confirma presença. A imagem de fundo do hero está em `static/images/new-bg.png`, e suas cores e posição ficam em `static/style.css`. A variável de ambiente `PIX_KEY` pode substituir a chave definida em `config.py`. Sem chave Pix, apenas essa opção fica oculta; as sugestões de roupas e perfumes continuam visíveis.
 
 Os ícones SVG locais em `static/icons/` são do [Lucide](https://lucide.dev/) e seguem a licença incluída em `static/icons/LICENSE`.
 

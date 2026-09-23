@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="506" height="100" viewBox="125 232 253 50" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Coração desenhado à mão entre dois traços dourados</title>
+  <defs>
+    <linearGradient id="gold" x1="135" y1="250" x2="369" y2="267" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E7B879"/>
+      <stop offset=".52" stop-color="#D9A15B"/>
+      <stop offset="1" stop-color="#B97E40"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#gold)">
+    <!-- Brushstroke on the left: gently tapered, deliberately irregular. -->
+    <path d="M135 271.2 C146 268.2 156.9 266.2 165 264.8 C180.2 261.9 195.6 258.6 208 257.4 C214.3 256.7 218.3 256.9 221.4 257.8 L222.2 258.8 C212.6 259.7 199.5 262 188.5 264.1 C177.3 266.3 168.3 267.2 158.8 268.8 C149.1 270.5 141.4 271.8 135 272.4 Z"/>
+    <!-- Brushstroke on the right. -->
+    <path d="M278.4 253.4 C291.5 251.5 308.1 248.2 322 247.7 C337.7 246.6 352.8 247.3 361.3 247.5 C365.2 247.7 367.1 248.2 368.5 248.6 C359.5 249.6 346.3 251 334.1 252.8 C321.1 254.6 306 255.3 296.4 255.9 C289.9 256.1 283.6 257 278 256.9 Z"/>
+    <!-- Hand-drawn heart with a cutout: pure vector, no background. -->
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M249.9 249.6 C252.4 245 255.5 240.9 261.4 239.3 C265.2 238.2 266 241.9 265.3 245.1 C263.8 253.5 257.5 265.9 252.1 273.2 C250.8 275 249.3 275.3 247.9 273.3 C243.3 267.7 238.3 258.7 237.2 253.2 C236.1 248 237.6 242.7 240.8 241.2 C243.7 239.8 246.9 243.1 249.9 249.6 Z M249.7 257.1 C248.5 257.4 247.9 256.3 247.5 254.8 C246.1 250.2 243.6 243.7 241.7 244 C238.6 244.5 240.1 251 241.7 255.1 C243.4 259.4 246.8 264.9 250.4 268.8 C255.1 262.6 260.7 252.6 261.9 247.1 C262.4 244.5 262.1 241.8 260.4 242.4 C256.6 243.6 253.2 250.2 251.1 255.4 C250.8 256.2 250.5 256.9 249.7 257.1 Z"/>
+  </g>
+</svg>

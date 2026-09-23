@@ -6,7 +6,8 @@
       <div class="hero-copy">
         <h1 id="hero-title"><span class="hero-name">{{ event.name }}</span><span class="hero-age">30</span></h1>
         <p class="hero-date">{{ event_short_date }} · {{ event_short_time }}</p>
-        <p class="hero-tagline">Uma noite para brindar a vida</p>
+        <p class="hero-tagline">Uma noite para celebrar brindar e sambar</p>
+        <img class="hero-divider" src="{{ url_for('static', filename='icons/coracao_samba.svg') }}" alt="" aria-hidden="true" width="253" height="50">
         <a class="button button-primary hero-button" href="#rsvp-dialog" data-open-rsvp>CONFIRMAR PRESENÇA <span class="ui-icon icon-arrow-up-right" aria-hidden="true"></span></a>
         <a class="hero-scroll-hint" href="#details-title">ROLE PARA VER MAIS <span class="ui-icon icon-arrow-down" aria-hidden="true"></span></a>
       </div>
@@ -41,7 +42,7 @@
       <div class="gifts-heading"><span class="section-label">UM CARINHO A MAIS</span><h2 id="gifts-title">Sugestões de <em>presente.</em></h2><p>Sua presença já é especial. Se quiser me presentear, estas são algumas ideias que vou adorar.</p></div>
       <div class="gift-options">
         <div class="gift-option"><span>01</span><div class="gift-option-copy"><strong>Roupas</strong><small>Parte superior: G · Parte inferior: 44</small></div></div>
-        <div class="gift-option"><span>02</span><strong>Perfumes</strong></div>
+        <div class="gift-option"><span>02</span><div class="gift-option-copy"><strong>Perfumes</strong><small>Florais e adocicados</small></div></div>
         <div class="gift-option"><span>03</span><strong>Bolsas e Acessórios</strong></div>
         {% if event.pix_key %}
         <details class="gift-option gift-pix"><summary><span>04</span><strong>Pix</strong><span class="gift-expand" aria-hidden="true">+</span></summary><div class="gift-pix-content"><p>Se preferir, esta também é uma opção.</p><strong id="pix-key">{{ event.pix_key }}</strong><button id="copy-pix" type="button" aria-label="Copiar chave Pix">Copiar chave Pix</button><small id="copy-pix-status" role="status" aria-live="polite"></small></div></details>
