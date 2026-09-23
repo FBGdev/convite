@@ -163,15 +163,7 @@ td strong{color:#35261b}
 .companion-fields{border:0;border-top:1px solid #dfcfb3;padding:20px 0 8px;margin:2px 0 14px;min-width:0}
 .companion-fields legend{padding:0 10px 0 0;font-size:16px;font-weight:700;color:var(--night)}
 .companion-fields>p{margin:0 0 18px;color:#786652;font-size:13px;line-height:1.5}
-.companion-fields .companion-row input{margin:8px 0 16px}
-.companions-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 8px}
-.companions-heading strong{font-size:14px;color:#3f2a1c}
-.companion-action{border:0;background:transparent;color:#77512d;font:inherit;font-size:13px;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:40px;padding:6px}
-.companion-action:focus-visible{outline:2px solid #9b683d;outline-offset:2px}
-.companion-input-line{display:flex;align-items:center;gap:8px}
-.companion-input-line input{min-width:0;flex:1}
-.companion-input-line .remove-companion{flex:none}
-.companion-names span{display:block;line-height:1.55}
+.companion-fields select{margin-bottom:8px}
 .dashboard-header{gap:14px}
 .dashboard-header .text-button{min-width:44px;min-height:44px;cursor:pointer}
 .dashboard-intro .button{box-shadow:none}

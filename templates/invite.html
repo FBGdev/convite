@@ -83,15 +83,12 @@
           <label class="choice"><input type="radio" name="attending" value="no" {% if form and form.attending == 'no' %}checked{% endif %}><span class="choice-mark"></span><span>Infelizmente, não poderei ir</span></label>
         </fieldset>
         <fieldset class="companion-fields" id="companion-fields">
-          <legend>Quem vai com você?</legend>
-          <p>Você pode incluir até seis acompanhantes além de você. Informe o nome de cada pessoa.</p>
-          <div class="companions-heading"><strong>Acompanhantes</strong><button id="add-companion" class="companion-action" type="button" hidden>+ Adicionar acompanhante</button></div>
-          {% for index in range(6) %}
-          <div class="companion-row" data-companion-row>
-            <label for="companion_name_{{ index + 1 }}">Nome do acompanhante {{ index + 1 }}</label>
-            <div class="companion-input-line"><input id="companion_name_{{ index + 1 }}" name="companion_names" type="text" minlength="2" maxlength="120" autocomplete="off" value="{{ form.companion_names[index] if form and form.companion_names | length > index else '' }}"><button class="companion-action remove-companion" type="button" aria-label="Remover acompanhante {{ index + 1 }}" hidden>Remover</button></div>
-          </div>
-          {% endfor %}
+          <legend>Acompanhantes</legend>
+          <p>Quantas pessoas irão com você? Você pode levar até seis acompanhantes.</p>
+          <label for="companions">Quantidade de acompanhantes</label>
+          <select id="companions" name="companions">
+            {% for count in range(7) %}<option value="{{ count }}" {% if form and form.companions == count | string %}selected{% endif %}>{{ 'Nenhum' if count == 0 else count }}</option>{% endfor %}
+          </select>
         </fieldset>
         <p class="drink-reminder drink-reminder-form">Traga sua bebida alcoólica de preferência.</p>
         <button class="button button-dark" type="submit">Enviar resposta <span class="ui-icon icon-arrow-up-right" aria-hidden="true"></span></button>
