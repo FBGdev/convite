@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#28180f">
   <meta name="description" content="Convite de aniversário de {{ event.name }}. Confirme sua presença.">
+  {% block social_meta %}{% endblock %}
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <title>{% block title %}Aniversário de {{ event.name }}{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">

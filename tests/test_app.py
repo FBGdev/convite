@@ -162,6 +162,21 @@ class InviteFlowTest(unittest.TestCase):
             self.assertIn(b"<svg", response.data)
             response.close()
 
+    def test_invite_open_graph_preview(self):
+        with patch.dict(os.environ, {"PUBLIC_SITE_URL": "https://convite.example.com/"}):
+            page = self.client.get("/").get_data(as_text=True)
+        self.assertIn('property="og:title" content="Isabelle faz 30 anos | Você está convidado"', page)
+        self.assertIn('property="og:url" content="https://convite.example.com/"', page)
+        self.assertIn('property="og:image" content="https://convite.example.com/static/images/convite-og.png"', page)
+        self.assertIn('property="og:image:width" content="1200"', page)
+        self.assertIn('property="og:image:height" content="630"', page)
+        self.assertNotIn('property="og:title"', self.client.get("/admin/entrar").get_data(as_text=True))
+        image = self.client.get("/static/images/convite-og.png")
+        self.assertEqual(image.status_code, 200)
+        self.assertEqual(image.content_type, "image/png")
+        self.assertEqual((int.from_bytes(image.data[16:20]), int.from_bytes(image.data[20:24])), (1200, 630))
+        image.close()
+
     def test_family_names_are_saved_and_counted(self):
         response = self.submit(bring_wife="yes", wife_name="  Beatriz   Maria  ",
                                child_names=["Carlos", "Dora"])

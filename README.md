@@ -44,7 +44,9 @@ Copie `.env.example` para `.env`, troque `ADMIN_PASSWORD`, `SECRET_KEY` e `SUPAB
 docker compose up --build -d
 ```
 
-O serviço escuta na porta 8000. Coloque um domínio e um proxy com HTTPS na frente do serviço. `COOKIE_SECURE=1` exige HTTPS para a sessão funcionar. Para testes locais sem HTTPS, use `COOKIE_SECURE=0`.
+O serviço escuta na porta 8000. Coloque um domínio e um proxy com HTTPS na frente do serviço. Defina `PUBLIC_SITE_URL` no `.env` com a URL pública do convite, sem barra final (por exemplo, `https://convite.exemplo.com.br`), para que a prévia do WhatsApp use links HTTPS corretos. Sem essa variável, a URL da requisição é usada. `COOKIE_SECURE=1` exige HTTPS para a sessão funcionar. Para testes locais sem HTTPS, use `COOKIE_SECURE=0`.
+
+A prévia do link usa as tags Open Graph em `templates/invite.html` e a imagem horizontal `static/images/convite-og.png` (1200 × 630). O arquivo `static/images/convite-og.svg` é a fonte editável da imagem. Ao alterar a arte, gere novamente o PNG antes de publicar.
 
 As respostas ficam no Supabase e continuam disponíveis depois que o contêiner reinicia. Faça backups pelo Supabase conforme a sua política de retenção.
 

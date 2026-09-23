@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Convite para os 30 anos de Isabelle, 22 de outubro de 2026, às 19h">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="75%">
+      <stop offset="0" stop-color="#624026"/>
+      <stop offset=".55" stop-color="#342014"/>
+      <stop offset="1" stop-color="#1e120d"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff0c7"/>
+      <stop offset=".48" stop-color="#e4b869"/>
+      <stop offset="1" stop-color="#a97438"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="26"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <ellipse cx="600" cy="315" rx="450" ry="215" fill="#af7840" opacity=".15" filter="url(#glow)"/>
+  <g fill="none" stroke="#c58c4d" stroke-linecap="round" opacity=".46">
+    <path d="M-50 120C100 115 110 18 290-40M-55 160C160 143 175 40 350-30M-50 198C140 174 240 85 350 20" stroke-width="13"/>
+    <path d="M1250 505C1100 510 1090 612 910 670M1255 465C1040 482 1025 585 850 660M1250 427C1060 451 960 540 850 605" stroke-width="13"/>
+    <circle cx="1065" cy="108" r="120" stroke-width="2"/>
+    <circle cx="1065" cy="108" r="102" stroke-width="1"/>
+    <path d="M1028 176V63l61-15v108M1028 87l61-15" stroke-width="8"/>
+    <path d="M1028 175c-29 12-47-7-26-21 20-13 42-6 26 21ZM1089 155c-29 12-47-7-26-21 20-13 42-6 26 21Z" fill="#c58c4d" stroke="none"/>
+    <path d="M78 441l60 151h87l60-151H78ZM105 472h153M140 437c-22-21-19-39-7-50M173 432c-15-17-14-31-3-47" stroke-width="4"/>
+    <path d="M95 478c37-10 79-9 124 2" stroke-width="8"/>
+  </g>
+  <rect x="29" y="28" width="1142" height="574" rx="2" fill="none" stroke="#c79255" stroke-width="2" opacity=".7"/>
+  <rect x="43" y="42" width="1114" height="546" rx="2" fill="none" stroke="#c79255" stroke-width="1" opacity=".3"/>
+  <g text-anchor="middle" fill="url(#gold)">
+    <text x="600" y="163" font-family="Georgia, Times New Roman, serif" font-size="26" letter-spacing="9">VOCÊ ESTÁ CONVIDADO</text>
+    <text x="600" y="282" font-family="Georgia, Times New Roman, serif" font-size="100" letter-spacing="13">ISABELLE</text>
+    <text x="600" y="394" font-family="Georgia, Times New Roman, serif" font-size="112" letter-spacing="5">30 ANOS</text>
+  </g>
+  <path d="M394 426h152m108 0h152" stroke="#d7a85e" stroke-width="2" opacity=".75"/>
+  <path d="M600 438c-18-12-26-24-18-34 8-9 18-2 18 5 0-7 10-14 18-5 8 10 0 22-18 34Z" fill="none" stroke="#e4b869" stroke-width="2"/>
+  <text x="600" y="488" text-anchor="middle" fill="#fff0cf" font-family="Arial, sans-serif" font-size="27" font-weight="700" letter-spacing="5">22.10.2026  ·  19H</text>
+  <text x="600" y="539" text-anchor="middle" fill="#dfbd84" font-family="Georgia, Times New Roman, serif" font-size="25" font-style="italic">Uma noite para celebrar, brindar e sambar!</text>
+</svg>

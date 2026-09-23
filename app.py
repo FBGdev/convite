@@ -92,6 +92,7 @@ def event_context():
         "event_short_time": EVENT["time"].replace(":00", "H"),
         "event_month": ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"][date.month - 1],
         "event_weekday": ["segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado", "domingo"][date.weekday()],
+        "public_site_url": os.environ.get("PUBLIC_SITE_URL", "").strip().rstrip("/") or request.url_root.rstrip("/"),
         "maps_url": EVENT.get("maps_url") or "https://www.google.com/maps/search/?api=1&query=" + quote(EVENT["address"]),
         "directions_url": "https://www.google.com/maps/dir/?api=1&destination=" + quote(f"{EVENT['map_latitude']},{EVENT['map_longitude']}"),
         "map_embed_url": f"https://maps.google.com/maps?q={EVENT['map_latitude']},{EVENT['map_longitude']}&z=17&output=embed",

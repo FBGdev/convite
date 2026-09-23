@@ -1,4 +1,20 @@
 {% extends "base.html" %}
+{% block social_meta %}
+  {% set invite_url = public_site_url ~ url_for('invite') %}
+  {% set image_url = public_site_url ~ url_for('static', filename='images/convite-og.png') %}
+  <link rel="canonical" href="{{ invite_url }}">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:title" content="{{ event.name }} faz 30 anos | Você está convidado">
+  <meta property="og:description" content="{{ event_day }} de {{ event_month }} de {{ event.date[:4] }}, às {{ event.time }}, no {{ event.venue }}. Confirme sua presença.">
+  <meta property="og:url" content="{{ invite_url }}">
+  <meta property="og:image" content="{{ image_url }}">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Convite para os 30 anos de {{ event.name }}">
+  <meta name="twitter:card" content="summary_large_image">
+{% endblock %}
 {% block content %}
 <main>
   <section class="hero" aria-labelledby="hero-title">
