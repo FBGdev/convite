@@ -14,7 +14,7 @@ Confira os dados da festa antes de compartilhar o link.
 
 O projeto configurado é `qwrgrogsuxjxcuhmkxjj`.
 
-1. As migrações de 22/09/2026 já foram aplicadas ao projeto configurado. Antes de publicar esta versão, execute `supabase/migrations/20260923_add_family_names.sql` no SQL Editor do Supabase. Para configurar outro projeto, execute todos os arquivos de migração em ordem.
+1. As migrações de 22/09/2026 já foram aplicadas ao projeto configurado. Antes de publicar esta versão, execute `supabase/migrations/20260923_add_family_names.sql` (se ainda não foi aplicada) e depois `supabase/migrations/20260923_switch_to_companions.sql` no SQL Editor do Supabase. Para configurar outro projeto, execute todos os arquivos de migração em ordem.
 2. Em **Settings → API Keys**, crie uma chave **secret** (`sb_secret_...`) exclusiva para este site. Guarde-a somente nas variáveis de ambiente do servidor.
 3. Defina `SUPABASE_URL=https://qwrgrogsuxjxcuhmkxjj.supabase.co` e `SUPABASE_SECRET_KEY` no servidor. Não use a chave `publishable` neste backend.
 
@@ -53,7 +53,7 @@ As respostas ficam no Supabase e continuam disponíveis depois que o contêiner 
 ## Como funciona
 
 - Cada telefone com DDD aceita uma resposta por evento. O formato com ou sem `+55` é normalizado.
-- Quem confirma presença pode incluir sua esposa e até dois filhos, com o nome de cada um. Outros acompanhantes não são aceitos. Quem informa que não vai à festa não pode incluir familiares.
+- Quem confirma presença pode incluir até seis acompanhantes além de si, com o nome de cada pessoa. Quem informa que não vai à festa não pode incluir acompanhantes. Os nomes de esposa e filhos enviados anteriormente continuam visíveis no painel como acompanhantes.
 - O formulário de confirmação abre em uma janela que ocupa a tela no celular; erros de validação reabrem a janela com os dados preenchidos.
 - O convite mostra um mapa do salão, um link para a página do local e um botão para traçar a rota pelo Google Maps.
 - A chave Pix é opcional e aparece no convite dentro de "Sugestões de presente" quando estiver definida em `config.py` ou em `PIX_KEY`. Qualquer visitante poderá copiá-la ao abrir essa opção.

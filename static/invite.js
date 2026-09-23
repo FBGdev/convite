@@ -55,57 +55,50 @@ phoneInput?.addEventListener('input', () => {
 
 if (phoneInput?.value) phoneInput.value = maskBrazilianPhone(phoneInput.value);
 
-const familyFields = document.getElementById('family-fields');
-const wifeCheckbox = document.getElementById('bring_wife');
-const wifeField = document.getElementById('wife-field');
-const wifeInput = document.getElementById('wife_name');
-const addChildButton = document.getElementById('add-child');
-const childRows = [...document.querySelectorAll('[data-child-row]')];
-const activeChildren = new Set(childRows.filter(row => row.querySelector('input').value.trim()));
+const companionFields = document.getElementById('companion-fields');
+const addCompanionButton = document.getElementById('add-companion');
+const companionRows = [...document.querySelectorAll('[data-companion-row]')];
+const activeCompanions = new Set(companionRows.filter(row => row.querySelector('input').value.trim()));
 
-function updateFamilyFields() {
-  if (!familyFields) return;
+function updateCompanionFields() {
+  if (!companionFields) return;
   const attending = document.querySelector('input[name="attending"]:checked')?.value === 'yes';
-  familyFields.hidden = !attending;
-  familyFields.disabled = !attending;
-  wifeField.hidden = !wifeCheckbox.checked;
-  wifeInput.disabled = !attending || !wifeCheckbox.checked;
-  wifeInput.required = attending && wifeCheckbox.checked;
-  let childNumber = 0;
-  childRows.forEach(row => {
-    const active = activeChildren.has(row);
+  companionFields.hidden = !attending;
+  companionFields.disabled = !attending;
+  let companionNumber = 0;
+  companionRows.forEach(row => {
+    const active = activeCompanions.has(row);
     const input = row.querySelector('input');
     row.hidden = !active;
     input.disabled = !attending || !active;
     input.required = attending && active;
-    const removeButton = row.querySelector('.remove-child');
+    const removeButton = row.querySelector('.remove-companion');
     removeButton.hidden = !active;
     if (active) {
-      childNumber += 1;
-      row.querySelector('label').textContent = `Nome do filho ${childNumber}`;
-      removeButton.setAttribute('aria-label', `Remover filho ${childNumber}`);
+      companionNumber += 1;
+      row.querySelector('label').textContent = `Nome do acompanhante ${companionNumber}`;
+      removeButton.setAttribute('aria-label', `Remover acompanhante ${companionNumber}`);
     }
   });
-  addChildButton.hidden = !attending || activeChildren.size >= 2;
+  addCompanionButton.hidden = !attending || activeCompanions.size >= 6;
 }
 
 document.querySelectorAll('input[name="attending"]').forEach(input => {
-  input.addEventListener('change', updateFamilyFields);
+  input.addEventListener('change', updateCompanionFields);
 });
-wifeCheckbox?.addEventListener('change', updateFamilyFields);
-addChildButton?.addEventListener('click', () => {
-  const row = childRows.find(item => !activeChildren.has(item));
+addCompanionButton?.addEventListener('click', () => {
+  const row = companionRows.find(item => !activeCompanions.has(item));
   if (!row) return;
-  activeChildren.add(row);
-  updateFamilyFields();
+  activeCompanions.add(row);
+  updateCompanionFields();
   row.querySelector('input').focus();
 });
-childRows.forEach(row => {
-  row.querySelector('.remove-child').addEventListener('click', () => {
+companionRows.forEach(row => {
+  row.querySelector('.remove-companion').addEventListener('click', () => {
     row.querySelector('input').value = '';
-    activeChildren.delete(row);
-    updateFamilyFields();
-    addChildButton.focus();
+    activeCompanions.delete(row);
+    updateCompanionFields();
+    addCompanionButton.focus();
   });
 });
-updateFamilyFields();
+updateCompanionFields();

@@ -82,6 +82,16 @@ app.jinja_env.filters["br_date"] = display_date
 app.jinja_env.filters["br_phone"] = format_phone
 
 
+def companion_names(row):
+    names = row.get("companion_names") or []
+    if names:
+        return names
+    return [name for name in [row.get("wife_name"), *(row.get("children_names") or [])] if name]
+
+
+app.jinja_env.filters["companion_names"] = companion_names
+
+
 @app.context_processor
 def event_context():
     date = datetime.strptime(EVENT["date"], "%Y-%m-%d")
@@ -111,33 +121,27 @@ def confirm():
     phone_input = request.form.get("phone", "").strip()
     phone = normalize_phone(phone_input)
     answer = request.form.get("attending")
-    bring_wife = request.form.get("bring_wife", "")
-    wife_name = " ".join(request.form.get("wife_name", "").split())
-    submitted_children = request.form.getlist("child_names")
-    children_names = [" ".join(child.split()) for child in submitted_children]
+    submitted_companions = request.form.getlist("companion_names")
+    names = [" ".join(person.split()) for person in submitted_companions]
+    old_family_fields = any(field in request.form for field in ("bring_wife", "wife_name", "child_names"))
     form = {"full_name": name, "phone": phone_input, "attending": answer,
-            "bring_wife": bring_wife, "wife_name": wife_name,
-            "child_names": children_names}
+            "companion_names": names}
 
     error = None
-    if len(name) < 3 or len(name) > 120:
+    if old_family_fields:
+        error = "O formulário mudou. Atualize a página e informe seus acompanhantes novamente."
+    elif len(name) < 3 or len(name) > 120:
         error = "Informe seu nome completo (3 a 120 caracteres)."
     elif not phone:
         error = "Informe um telefone com DDD válido."
     elif answer not in ("yes", "no"):
         error = "Selecione se você vai comparecer."
-    elif bring_wife not in ("", "yes"):
-        error = "Selecione corretamente se levará sua esposa."
-    elif answer == "no" and (bring_wife or wife_name or any(children_names)):
-        error = "Informe esposa e filhos somente se você for à festa."
-    elif bring_wife == "yes" and not 2 <= len(wife_name) <= 120:
-        error = "Informe o nome da sua esposa (2 a 120 caracteres)."
-    elif bring_wife != "yes" and wife_name:
-        error = "Marque a opção de levar sua esposa para informar o nome dela."
-    elif len(submitted_children) > 2:
-        error = "Você pode adicionar até dois filhos."
-    elif any(child and not 2 <= len(child) <= 120 for child in children_names):
-        error = "Informe o nome de cada filho com 2 a 120 caracteres."
+    elif answer == "no" and any(names):
+        error = "Informe acompanhantes somente se você for à festa."
+    elif len(submitted_companions) > 6:
+        error = "Você pode adicionar até seis acompanhantes."
+    elif any(person and not 2 <= len(person) <= 120 for person in names):
+        error = "Informe o nome de cada acompanhante com 2 a 120 caracteres."
 
     if error:
         return render_template("invite.html", error=error, form=form), 400
@@ -147,8 +151,7 @@ def confirm():
         existing = store.by_phone(phone)
         if existing:
             return render_template("invite.html", error="Este telefone já respondeu. Se precisar corrigir sua resposta, fale com a aniversariante.", form=form), 409
-        store.create(name, phone, answer == "yes", wife_name or None,
-                     [child for child in children_names if child], now)
+        store.create(name, phone, answer == "yes", [person for person in names if person], now)
     except DuplicatePhone:
         return render_template("invite.html", error="Este telefone já respondeu. Se precisar corrigir sua resposta, fale com a aniversariante.", form=form), 409
     except StoreError:
@@ -212,8 +215,7 @@ def admin_dashboard():
     query_digits = re.sub(r"\D", "", query)
     rows = [row for row in all_rows if
             (not query or query.casefold() in row["full_name"].casefold() or
-             query.casefold() in (row.get("wife_name") or "").casefold() or
-             any(query.casefold() in child.casefold() for child in (row.get("children_names") or [])) or
+             any(query.casefold() in person.casefold() for person in companion_names(row)) or
              (query_digits and query_digits in row["phone"])) and
             (status == "all" or bool(row["attending"]) == (status == "yes"))]
     return render_template("admin.html", totals=totals, rows=rows, query=query, status=status)
@@ -247,12 +249,11 @@ def admin_export():
         abort(503, "Não foi possível exportar a lista agora.")
     output = io.StringIO()
     writer = csv.writer(output, delimiter=";")
-    writer.writerow(["Nome", "Telefone", "Resposta", "Esposa", "Filhos", "Total de pessoas", "Data da confirmação"])
+    writer.writerow(["Nome", "Telefone", "Resposta", "Acompanhantes", "Total de pessoas", "Data da confirmação"])
     for row in rows:
         writer.writerow([csv_safe(row["full_name"]), row["phone"],
                          "Sim" if row["attending"] else "Não",
-                         csv_safe(row.get("wife_name") or ""),
-                         csv_safe(", ".join(row.get("children_names") or [])),
+                         csv_safe(", ".join(companion_names(row))),
                          1 + row.get("companions", 0) + row.get("children", 0) if row["attending"] else 0,
                          display_date(row["updated_at"])])
     response = Response("\ufeff" + output.getvalue(), mimetype="text/csv; charset=utf-8")
