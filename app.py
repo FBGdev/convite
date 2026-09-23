@@ -1,7 +1,6 @@
 """Convite de aniversário com confirmação de presença e painel privado."""
 
 import csv
-import hashlib
 import hmac
 import io
 import os
@@ -75,10 +74,6 @@ def format_phone(value):
     return f"({digits[:2]}) {digits[2:-4]}-{digits[-4:]}"
 
 
-def edit_hash(code):
-    return hashlib.sha256(code.strip().upper().encode("utf-8")).hexdigest()
-
-
 def display_date(value):
     return datetime.fromisoformat(value).astimezone(ZoneInfo("America/Sao_Paulo")).strftime("%d/%m/%Y às %H:%M")
 
@@ -113,7 +108,6 @@ def confirm():
     phone_input = request.form.get("phone", "").strip()
     phone = normalize_phone(phone_input)
     answer = request.form.get("attending")
-    code = request.form.get("edit_code", "").strip().upper()
     form = {"full_name": name, "phone": phone_input, "attending": answer}
 
     error = None
@@ -131,22 +125,15 @@ def confirm():
     try:
         existing = store.by_phone(phone)
         if existing:
-            if not code:
-                return render_template("invite.html", error="Este telefone já respondeu. Para alterar a resposta, informe o código de edição recebido na primeira confirmação.", form=form), 409
-            if not hmac.compare_digest(existing["edit_code_hash"], edit_hash(code)):
-                return render_template("invite.html", error="Código de edição incorreto. Confira o código e tente novamente.", form=form), 403
-            store.update(existing["id"], name, answer == "yes", now)
-            new_code = None
-        else:
-            new_code = secrets.token_hex(6).upper()
-            store.create(name, phone, answer == "yes", edit_hash(new_code), now)
+            return render_template("invite.html", error="Este telefone já respondeu. Se precisar corrigir sua resposta, fale com a aniversariante.", form=form), 409
+        store.create(name, phone, answer == "yes", now)
     except DuplicatePhone:
-        return render_template("invite.html", error="Este telefone já respondeu. Recarregue a página e use seu código de edição.", form=form), 409
+        return render_template("invite.html", error="Este telefone já respondeu. Se precisar corrigir sua resposta, fale com a aniversariante.", form=form), 409
     except StoreError:
         app.logger.exception("Erro ao salvar confirmação no Supabase")
         return render_template("invite.html", error="Não foi possível registrar sua resposta agora. Tente novamente em instantes.", form=form), 503
 
-    return render_template("success.html", attending=answer == "yes", code=new_code, updated=new_code is None)
+    return render_template("success.html", attending=answer == "yes")
 
 
 @app.route("/admin/entrar", methods=["GET", "POST"])

@@ -1,5 +1,26 @@
 {% extends "base.html" %}
 {% block title %}Resposta recebida · Aniversário de {{ event.name }}{% endblock %}
 {% block content %}
-<main class="message-page"><div class="message-card"><div class="message-icon" aria-hidden="true"><span class="ui-icon {% if attending %}icon-party-popper{% else %}icon-heart{% endif %}"></span></div><div class="section-label">RESPOSTA REGISTRADA</div><h1>{% if attending %}Presença <em>confirmada!</em>{% else %}Obrigado por <em>avisar.</em>{% endif %}</h1><p>{% if attending %}Estamos esperando você para comemorar esse dia especial!{% else %}Sentiremos sua falta, mas agradecemos por responder. Esperamos celebrar juntos em outra ocasião!{% endif %}</p>{% if code %}<div class="edit-code-box"><span>GUARDE SEU CÓDIGO DE EDIÇÃO</span><strong>{{ code }}</strong><small>Se mudar de ideia, volte ao convite, abra “Confirmar presença” e informe o mesmo telefone com este código. Ele aparece apenas agora.</small></div>{% elif updated %}<div class="updated-note">Sua resposta anterior foi atualizada com sucesso.</div>{% endif %}<a class="button button-dark" href="{{ url_for('invite') }}">Voltar ao convite <span class="ui-icon icon-arrow-up-right" aria-hidden="true"></span></a></div></main>
+<main class="message-page">
+  <div class="message-card">
+    <div class="message-icon" aria-hidden="true"><span class="ui-icon {% if attending %}icon-party-popper{% else %}icon-heart{% endif %}"></span></div>
+    <div class="section-label">RESPOSTA REGISTRADA</div>
+    <h1>{% if attending %}Presença <em>confirmada!</em>{% else %}Obrigado por <em>avisar.</em>{% endif %}</h1>
+    <p>{% if attending %}Estamos esperando você para comemorar esse dia especial!{% else %}Sentiremos sua falta, mas agradecemos por responder. Esperamos celebrar juntos em outra ocasião!{% endif %}</p>
+
+    {% if event.pix_key %}
+    <section class="success-pix" aria-labelledby="success-pix-title">
+      <span class="section-label">PRESENTE OPCIONAL</span>
+      <h2 id="success-pix-title">Seu carinho já é um presente.</h2>
+      <p>Se quiser presentear a {{ event.name }}, você pode usar esta chave Pix:</p>
+      <strong id="pix-key">{{ event.pix_key }}</strong>
+      <button id="copy-pix" type="button">Copiar chave Pix</button>
+      <small id="copy-pix-status" role="status" aria-live="polite"></small>
+    </section>
+    {% endif %}
+
+    <a class="button button-dark" href="{{ url_for('invite') }}">Voltar ao convite <span class="ui-icon icon-arrow-up-right" aria-hidden="true"></span></a>
+  </div>
+</main>
+{% if event.pix_key %}<script src="{{ url_for('static', filename='pix.js') }}" defer></script>{% endif %}
 {% endblock %}

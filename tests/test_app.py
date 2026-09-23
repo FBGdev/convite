@@ -1,6 +1,6 @@
 import importlib
+import json
 import os
-import re
 import unittest
 from unittest.mock import patch
 
@@ -13,16 +13,12 @@ class FakeStore:
     def by_phone(self, phone):
         return next((row for row in self.records if row["phone"] == phone), None)
 
-    def create(self, full_name, phone, attending, code_hash, now):
+    def create(self, full_name, phone, attending, now):
         if self.by_phone(phone):
             raise self.duplicate_error()
         self.records.append({"id": len(self.records) + 1, "full_name": full_name, "phone": phone,
                              "attending": attending,
-                             "edit_code_hash": code_hash, "updated_at": now})
-
-    def update(self, record_id, full_name, attending, now):
-        row = next(row for row in self.records if row["id"] == record_id)
-        row.update(full_name=full_name, attending=attending, updated_at=now)
+                             "updated_at": now})
 
     def all(self):
         return list(self.records)
@@ -60,17 +56,17 @@ class InviteFlowTest(unittest.TestCase):
         self.client.get("/admin/entrar")
         return self.client.post("/admin/entrar", data={"csrf_token": self.csrf(), "password": "test-admin-password"})
 
-    def test_confirmation_duplicate_and_verified_update(self):
+    def test_confirmation_duplicate_and_pix_gift(self):
         first = self.submit()
         self.assertEqual(first.status_code, 200)
         self.assertIn("Presença <em>confirmada!</em>".encode(), first.data)
-        code = re.search(rb'<strong>([A-F0-9]{12})</strong>', first.data).group(1).decode()
+        self.assertIn(self.module.EVENT["pix_key"].encode(), first.data)
+        self.assertIn(b'id="copy-pix"', first.data)
+        self.assertNotIn("CÓDIGO DE EDIÇÃO".encode(), first.data)
         self.assertEqual(self.submit(phone="+55 11 99999-1234").status_code, 409)
-        self.assertEqual(self.submit(edit_code="WRONGCODE").status_code, 403)
-        updated = self.submit(attending="no", edit_code=code)
-        self.assertEqual(updated.status_code, 200)
+        self.assertEqual(self.submit(attending="no", edit_code="WRONGCODE").status_code, 409)
         self.assertEqual(len(self.module.store.records), 1)
-        self.assertFalse(self.module.store.records[0]["attending"])
+        self.assertTrue(self.module.store.records[0]["attending"])
 
     def test_private_dashboard_csv_and_delete(self):
         self.submit()
@@ -124,7 +120,7 @@ class InviteFlowTest(unittest.TestCase):
         self.assertEqual(page.count('data-open-rsvp'), 1)
         self.assertNotIn('class="rsvp-prompt"', page)
         self.assertNotIn('<section class="rsvp"', page)
-        self.assertIn('id="edit-field" class="edit-field"', page)
+        self.assertNotIn('name="edit_code"', page)
         self.assertNotIn('name="companions"', page)
         self.assertNotIn('name="children"', page)
         self.assertNotIn('name="adult_names"', page)
@@ -165,6 +161,27 @@ class SupabaseRequestTest(unittest.TestCase):
         request = mocked.call_args.args[0]
         self.assertEqual(request.get_header("Apikey"), "sb_secret_test")
         self.assertIsNone(request.get_header("Authorization"))
+
+    def test_new_rsvp_does_not_send_edit_code(self):
+        from supabase_store import SupabaseStore
+
+        with patch.dict(os.environ, {"SUPABASE_URL": "https://example.supabase.co", "SUPABASE_SECRET_KEY": "sb_secret_test"}):
+            store = SupabaseStore()
+
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def read(self):
+                return b""
+
+        with patch("supabase_store.urlopen", return_value=FakeResponse()) as mocked:
+            store.create("Ana Maria", "11999991234", True, "2026-09-22T00:00:00+00:00")
+        payload = json.loads(mocked.call_args.args[0].data)
+        self.assertNotIn("edit_code_hash", payload)
 
 
 if __name__ == "__main__":

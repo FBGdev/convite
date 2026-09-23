@@ -51,27 +51,17 @@ class SupabaseStore:
             raise StoreError("Não foi possível acessar o Supabase.") from exc
 
     def by_phone(self, phone):
-        rows = self._request(params={"select": "id,edit_code_hash", "phone": f"eq.{phone}", "limit": "1"})
+        rows = self._request(params={"select": "id", "phone": f"eq.{phone}", "limit": "1"})
         return rows[0] if rows else None
 
-    def create(self, full_name, phone, attending, code_hash, now):
+    def create(self, full_name, phone, attending, now):
         self._request("POST", payload={
             "full_name": full_name,
             "phone": phone,
             "attending": attending,
             "companions": 0,
             "children": 0,
-            "edit_code_hash": code_hash,
             "created_at": now,
-            "updated_at": now,
-        })
-
-    def update(self, record_id, full_name, attending, now):
-        self._request("PATCH", params={"id": f"eq.{record_id}"}, payload={
-            "full_name": full_name,
-            "attending": attending,
-            "companions": 0,
-            "children": 0,
             "updated_at": now,
         })
 
