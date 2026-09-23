@@ -299,7 +299,7 @@ td strong{color:#35261b}
 .gift-pix-content button:hover{background:#563820}
 .gift-pix-content small{min-height:18px;color:#6b5540}
 @media(max-width:650px){
-  .hero{min-height:100svh;background-position:center top}
+  .hero{min-height:100svh;background-size:100% 100%;background-position:center}
   .hero:after{inset:12px}
   .hero-inner{display:grid;flex:none;min-height:0;padding:75px 8% 35px}
   .hero h1{margin:0}
@@ -313,4 +313,4 @@ td strong{color:#35261b}
   .gifts-inner{display:block}
   .gift-options{margin-top:28px}
 }
-@media(max-width:370px){.hero-age{font-size:172px}.hero-date{font-size:12px}.hero-tagline{font-size:26px}}
+@media(max-width:370px){.hero-name{font-size:32px;letter-spacing:.08em;text-indent:.08em}.hero-age{font-size:172px}.hero-date{font-size:12px}.hero-tagline{font-size:26px}.hero-button{min-width:0;padding-inline:12px;font-size:10px;letter-spacing:.07em;white-space:nowrap}}
