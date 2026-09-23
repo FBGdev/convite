@@ -7,7 +7,7 @@
     <div class="section-label">RESPOSTA REGISTRADA</div>
     <h1>{% if attending %}Presença <em>confirmada!</em>{% else %}Obrigado por <em>avisar.</em>{% endif %}</h1>
     <p>{% if attending %}Sua resposta foi registrada. Estamos esperando você e sua família, se incluída, para comemorar esse dia especial!{% else %}Sentiremos sua falta, mas agradecemos por responder. Esperamos celebrar juntos em outra ocasião!{% endif %}</p>
-    {% if attending %}<p class="drink-reminder">Cada pessoa que for consumir bebida alcoólica deve levar a sua.</p>{% endif %}
+    {% if attending %}<p class="drink-reminder">Traga sua bebida alcoólica de preferência.</p>{% endif %}
     {% if attending %}<p class="gift-suggestion">Sua presença já é especial. Se quiser levar um carinho a mais para a aniversariante, <a href="{{ url_for('invite') }}#gifts-title">veja as sugestões de presente</a>.</p>{% endif %}
 
     <a class="button button-dark" href="{{ url_for('invite') }}">Voltar ao convite <span class="ui-icon icon-arrow-up-right" aria-hidden="true"></span></a>
