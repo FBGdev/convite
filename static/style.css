@@ -257,8 +257,8 @@ td strong{color:#35261b}
 .back-link .ui-icon{font-size:16px}
 
 /* Convite de 30 anos: composição tipográfica sem ilustração. */
-.hero{min-height:100svh;display:flex;flex-direction:column;background:#24160f}
-.hero:before{background:radial-gradient(ellipse at 50% 36%,rgba(139,93,47,.2),transparent 60%)}
+.hero{min-height:100svh;display:flex;flex-direction:column;background:#24160f url('images/fundo.png') center / cover no-repeat}
+.hero:before{background:radial-gradient(ellipse at 50% 45%,rgba(12,6,3,.42),rgba(12,6,3,.18) 58%,transparent 80%)}
 .hero:after{content:'';position:absolute;inset:20px;border:1px solid rgba(224,190,122,.28);pointer-events:none}
 .hero-inner{width:100%;max-width:1000px;min-height:0;flex:1;display:grid;grid-template-columns:1fr;place-items:center;padding:82px 8% 55px}
 .hero-copy{text-align:center}
@@ -299,7 +299,7 @@ td strong{color:#35261b}
 .gift-pix-content button:hover{background:#563820}
 .gift-pix-content small{min-height:18px;color:#6b5540}
 @media(max-width:650px){
-  .hero{min-height:100svh}
+  .hero{min-height:100svh;background-position:center top}
   .hero:after{inset:12px}
   .hero-inner{display:grid;flex:none;min-height:0;padding:75px 8% 35px}
   .hero h1{margin:0}
