@@ -84,7 +84,7 @@
         </fieldset>
         <fieldset class="companion-fields" id="companion-fields">
           <legend>Acompanhantes</legend>
-          <p>Quantas pessoas irão com você? Confirme os nomes que estão no convite</p>
+          <p>Confirme os nomes que estão no convite</p>
           <label for="companions">Quantidade de acompanhantes</label>
           <select id="companions" name="companions">
             {% for count in range(7) %}<option value="{{ count }}" {% if form and form.companions == count | string %}selected{% endif %}>{{ 'Nenhum' if count == 0 else count }}</option>{% endfor %}
