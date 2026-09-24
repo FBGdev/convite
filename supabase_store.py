@@ -46,7 +46,11 @@ class SupabaseStore:
                 error = {}
             if exc.code == 409 and error.get("code") == "23505":
                 raise DuplicatePhone from exc
-            raise StoreError(f"Supabase respondeu com HTTP {exc.code}.") from exc
+            error_code = error.get("code") or "sem código"
+            error_message = error.get("message") or "sem mensagem"
+            raise StoreError(
+                f"Supabase respondeu com HTTP {exc.code} ({error_code}): {error_message[:300]}"
+            ) from exc
         except (URLError, TimeoutError) as exc:
             raise StoreError("Não foi possível acessar o Supabase.") from exc
 
@@ -54,12 +58,13 @@ class SupabaseStore:
         rows = self._request(params={"select": "id", "phone": f"eq.{phone}", "limit": "1"})
         return rows[0] if rows else None
 
-    def create(self, full_name, phone, attending, companions, now):
+    def create(self, full_name, phone, attending, companion_names, now):
         self._request("POST", payload={
             "full_name": full_name,
             "phone": phone,
             "attending": attending,
-            "companions": companions,
+            "companion_names": companion_names,
+            "companions": len(companion_names),
             "children": 0,
             "created_at": now,
             "updated_at": now,
@@ -70,7 +75,7 @@ class SupabaseStore:
         offset = 0
         while True:
             batch = self._request(params={
-                "select": "id,full_name,phone,attending,companions,children,updated_at",
+                "select": "id,full_name,phone,attending,companion_names,wife_name,children_names,companions,children,updated_at",
                 "order": "updated_at.desc,id.desc",
                 "limit": "500",
                 "offset": str(offset),

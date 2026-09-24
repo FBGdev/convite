@@ -13,11 +13,12 @@ class FakeStore:
     def by_phone(self, phone):
         return next((row for row in self.records if row["phone"] == phone), None)
 
-    def create(self, full_name, phone, attending, companions, now):
+    def create(self, full_name, phone, attending, companion_names, now):
         if self.by_phone(phone):
             raise self.duplicate_error()
         self.records.append({"id": len(self.records) + 1, "full_name": full_name, "phone": phone,
-                             "attending": attending, "companions": companions,
+                             "attending": attending, "companion_names": companion_names,
+                             "companions": len(companion_names),
                              "children": 0,
                              "updated_at": now})
 
@@ -113,26 +114,28 @@ class InviteFlowTest(unittest.TestCase):
         self.assertIn(b'data-open-on-load="true"', invalid.data)
         self.assertIn(b'value="123"', invalid.data)
         self.assertEqual(self.submit(attending="maybe").status_code, 400)
-        self.assertEqual(self.submit(companions="2", children="99").status_code, 200)
+        self.assertEqual(self.submit(companion_names=["Beatriz", "Carlos"]).status_code, 200)
+        self.assertEqual(self.module.store.records[0]["companion_names"], ["Beatriz", "Carlos"])
         self.assertEqual(self.module.store.records[0]["companions"], 2)
         self.assertEqual(self.module.store.records[0]["children"], 0)
 
-    def test_invite_asks_only_for_companion_count(self):
+    def test_invite_allows_up_to_six_named_companions(self):
         page = self.client.get("/").get_data(as_text=True)
         self.assertIn('<dialog id="rsvp-dialog"', page)
         self.assertEqual(page.count('data-open-rsvp'), 1)
         self.assertNotIn('class="rsvp-prompt"', page)
         self.assertNotIn('<section class="rsvp"', page)
         self.assertNotIn('name="edit_code"', page)
-        self.assertIn('name="companions"', page)
+        self.assertIn('name="companion_names"', page)
+        self.assertIn('id="add-companion"', page)
         self.assertNotIn('name="children"', page)
         self.assertNotIn('name="adult_names"', page)
         self.assertNotIn('name="bring_wife"', page)
         self.assertNotIn('name="wife_name"', page)
         self.assertNotIn('name="child_names"', page)
-        self.assertNotIn('name="companion_names"', page)
+        self.assertNotIn('name="companions"', page)
         self.assertIn('até seis acompanhantes', page)
-        self.assertEqual(page.count('<option value="'), 7)
+        self.assertEqual(page.count('data-companion-row'), 6)
         self.assertIn(self.module.EVENT["maps_url"], page)
         self.assertIn('title="Mapa do local da festa:', page)
         self.assertIn('Traçar rota', page)
@@ -178,33 +181,35 @@ class InviteFlowTest(unittest.TestCase):
         self.assertEqual((int.from_bytes(image.data[16:20]), int.from_bytes(image.data[20:24])), (1200, 630))
         image.close()
 
-    def test_companion_count_is_saved_and_counted(self):
-        response = self.submit(companions="6")
+    def test_named_companions_are_saved_and_counted(self):
+        names = ["Beatriz", "Carlos", "Daniela", "Eduardo", "Fernanda", "Gabriel"]
+        response = self.submit(companion_names=names)
         self.assertEqual(response.status_code, 200)
         row = self.module.store.records[0]
         self.assertEqual((row["companions"], row["children"]), (6, 0))
+        self.assertEqual(row["companion_names"], names)
         self.login()
         dashboard = self.client.get("/admin").get_data(as_text=True)
-        self.assertIn('data-label="Acompanhantes">6</td>', dashboard)
+        self.assertIn('data-label="Acompanhantes"', dashboard)
+        for person in names:
+            self.assertIn(person, dashboard)
         self.assertIn("<strong>7</strong>", dashboard)
         csv_text = self.client.get("/admin/exportar.csv").get_data(as_text=True)
-        self.assertIn("Quantidade de acompanhantes;Total de pessoas", csv_text)
-        self.assertIn("Sim;6;7;", csv_text)
+        self.assertIn("Acompanhantes;Total de pessoas", csv_text)
+        self.assertIn("Sim;Beatriz, Carlos, Daniela, Eduardo, Fernanda, Gabriel;7;", csv_text)
 
     def test_companion_count_validation(self):
         self.assertEqual(self.submit(bring_wife="yes", wife_name="Beatriz").status_code, 400)
-        self.assertEqual(self.submit(companion_names=["Beatriz"]).status_code, 400)
-        self.assertEqual(self.submit(companions="7").status_code, 400)
-        self.assertEqual(self.submit(companions="-1").status_code, 400)
-        self.assertEqual(self.submit(companions="dois").status_code, 400)
-        self.assertEqual(self.submit(attending="no", companions="1").status_code, 400)
-        invalid = self.submit(phone="123", companions="5")
+        self.assertEqual(self.submit(companion_names=["Beatriz"] * 7).status_code, 400)
+        self.assertEqual(self.submit(companion_names=["A"]).status_code, 400)
+        self.assertEqual(self.submit(attending="no", companion_names=["Beatriz"]).status_code, 400)
+        invalid = self.submit(phone="123", companion_names=["Beatriz", "Carlos"])
         self.assertEqual(invalid.status_code, 400)
-        self.assertIn(b'<option value="5" selected>', invalid.data)
+        self.assertIn(b'value="Beatriz"', invalid.data)
         self.assertEqual(self.module.store.records, [])
 
     def test_companions_are_optional_for_an_individual_or_decline(self):
-        self.assertEqual(self.submit(companions="0").status_code, 200)
+        self.assertEqual(self.submit().status_code, 200)
         self.assertEqual(self.module.store.records[0]["companions"], 0)
         decline = self.submit(full_name="Bruno Lima", phone="(21) 3333-2222", attending="no")
         self.assertEqual(decline.status_code, 200)
@@ -226,7 +231,7 @@ class InviteFlowTest(unittest.TestCase):
         self.assertIn("<strong>3</strong>", dashboard)
         csv_text = self.client.get("/admin/exportar.csv").get_data(as_text=True)
         self.assertIn("Pessoa Antiga", csv_text)
-        self.assertIn("Sim;2;3;", csv_text)
+        self.assertIn("Sim;;3;", csv_text)
 
 
 class SupabaseRequestTest(unittest.TestCase):
@@ -269,10 +274,10 @@ class SupabaseRequestTest(unittest.TestCase):
                 return b""
 
         with patch("supabase_store.urlopen", return_value=FakeResponse()) as mocked:
-            store.create("Ana Maria", "11999991234", True, 2, "2026-09-22T00:00:00+00:00")
+            store.create("Ana Maria", "11999991234", True, ["Beatriz", "Carlos"], "2026-09-22T00:00:00+00:00")
         payload = json.loads(mocked.call_args.args[0].data)
         self.assertNotIn("edit_code_hash", payload)
-        self.assertNotIn("companion_names", payload)
+        self.assertEqual(payload["companion_names"], ["Beatriz", "Carlos"])
         self.assertNotIn("wife_name", payload)
         self.assertNotIn("children_names", payload)
         self.assertEqual((payload["companions"], payload["children"]), (2, 0))

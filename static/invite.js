@@ -56,15 +56,49 @@ phoneInput?.addEventListener('input', () => {
 if (phoneInput?.value) phoneInput.value = maskBrazilianPhone(phoneInput.value);
 
 const companionFields = document.getElementById('companion-fields');
+const addCompanionButton = document.getElementById('add-companion');
+const companionRows = [...document.querySelectorAll('[data-companion-row]')];
+const activeCompanions = new Set(companionRows.filter(row => row.querySelector('input').value.trim()));
 
 function updateCompanionFields() {
   if (!companionFields) return;
   const attending = document.querySelector('input[name="attending"]:checked')?.value === 'yes';
   companionFields.hidden = !attending;
   companionFields.disabled = !attending;
+  let companionNumber = 0;
+  companionRows.forEach(row => {
+    const active = activeCompanions.has(row);
+    const input = row.querySelector('input');
+    row.hidden = !active;
+    input.disabled = !attending || !active;
+    input.required = attending && active;
+    const removeButton = row.querySelector('.remove-companion');
+    removeButton.hidden = !active;
+    if (active) {
+      companionNumber += 1;
+      row.querySelector('label').textContent = `Nome do acompanhante ${companionNumber}`;
+      removeButton.setAttribute('aria-label', `Remover acompanhante ${companionNumber}`);
+    }
+  });
+  addCompanionButton.hidden = !attending || activeCompanions.size >= 6;
 }
 
 document.querySelectorAll('input[name="attending"]').forEach(input => {
   input.addEventListener('change', updateCompanionFields);
+});
+addCompanionButton?.addEventListener('click', () => {
+  const row = companionRows.find(item => !activeCompanions.has(item));
+  if (!row) return;
+  activeCompanions.add(row);
+  updateCompanionFields();
+  row.querySelector('input').focus();
+});
+companionRows.forEach(row => {
+  row.querySelector('.remove-companion').addEventListener('click', () => {
+    row.querySelector('input').value = '';
+    activeCompanions.delete(row);
+    updateCompanionFields();
+    addCompanionButton.focus();
+  });
 });
 updateCompanionFields();
